@@ -397,16 +397,6 @@ export default function MoodApp() {
 
   return (
     <>
-      <div
-        className="ambient"
-        style={{
-          background: `radial-gradient(120% 90% at 50% 0%, ${bg[0]} 0%, ${bg[1]} 100%)`,
-        }}
-      >
-        <span className="orb orb-a" style={{ background: bg[1] }} />
-        <span className="orb orb-b" style={{ background: bg[0] }} />
-      </div>
-
       <nav className="tabs">
         <button
           className={`tab${tab === "today" ? " on" : ""}`}
