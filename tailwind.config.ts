@@ -6,9 +6,6 @@ const config: Config = {
     "./components/**/*.{ts,tsx}",
     "./lib/**/*.{ts,tsx}",
   ],
-  corePlugins: {
-    preflight: false, // 기존 globals.css와 공존 (마이그레이션 완료 후 제거)
-  },
   theme: {
     extend: {
       colors: {

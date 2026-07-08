@@ -41,7 +41,7 @@ import {
   Tabs, Tab, DailyBanner, DailyLabel, DailyText, DailyAuthor, SectionLabel,
   Footer, PersonaRow, PersonaChip, PersonaPhoto, PersonaCopy, PersonaName,
   PersonaTag, MoodGrid, MoodBtn, MoodEmoji, MoodCopy, MoodName, MoodCaption,
-  MoodLine, FortuneCard, FortuneHead, FortuneLine, FortuneGauge, FortuneGaugeTop,
+  MoodLine, DailyReflect, FortuneCard, FortuneHead, FortuneLine, FortuneGauge, FortuneGaugeTop,
   FortuneScore, FortuneBar, FortuneBarFill, FortuneFlow, FortuneGrid, FortuneItem,
   FortuneKey, FortuneVal, FortuneSwatch, FortuneTip, FortuneNote,
 } from "@/components/ui/home";
@@ -51,6 +51,21 @@ import {
   StepTitle, StepSub, IntensityValue, SliderEnds, FreeBtn, FreeInput,
   Choices, Choice,
 } from "@/components/ui/step";
+import {
+  LetterCard, Report, ReportLabel, ReportType, ReportEmoji, ReportScore,
+  ReportScoreTop, ReportScoreNum, ReportBar, ReportBarFill, ReportSummary,
+  Reading, ReadingLabel, ReadingRead, ReadingSuggest, ReadingSuggestTag,
+  ReadingSuggestText, ReadingCaution, LetterFrom, LetterAvatarImg,
+  LetterFromText, LetterTag, LetterOpen, LetterEcho, LetterEchoTail,
+  LetterReflect, LetterLine, LetterBody, QuoteBlock, QuoteText, QuoteAuthor,
+  SupportNote, LetterSign, PsBox, PsLabel, PsSaved, PsBtn, Disclaimer,
+  Explore, ExploreLabel, ExploreLinks, ExploreLink, Actions, Btn,
+} from "@/components/ui/letter";
+import { CalEmptyMsg } from "@/components/ui/calendar";
+import {
+  SavedWrap, SavedCard, SavedTop, SavedEmoji, SavedDate, SavedDel,
+  SavedMessage, SavedQuote, SavedQAuthor,
+} from "@/components/ui/saved";
 import MoodCalendar from "@/components/MoodCalendar";
 
 const DEFAULT_BG: [string, string] = ["#FBF6EE", "#F3E9DB"];
@@ -207,6 +222,15 @@ export default function MoodApp() {
     () => (todayKey ? buildFortune(todayKey, history, uidRef.current || undefined) : null),
     [todayKey, history]
   );
+
+  // 마음 날씨 기록이 쌓였을 때 한마디 배너에 보여줄 따뜻한 한 줄
+  const moodReflect = useMemo<string | null>(() => {
+    const total = Object.values(journal).reduce((s, arr) => s + arr.length, 0);
+    if (total === 0) return null;
+    if (streak >= 2)
+      return `🌱 ${streak}일째 마음을 살피고 있어요. 오늘도 잘 왔어요.`;
+    return `🌱 벌써 ${total}번째 마음을 들여다봤어요. 오늘도 잘 왔어요.`;
+  }, [journal, streak]);
 
   const bg = mood && stage !== "home" ? mood.bg : DEFAULT_BG;
 
@@ -438,6 +462,7 @@ export default function MoodApp() {
                 ) : (
                   <DailyText className="opacity-60">오늘의 한마디를 불러오는 중…</DailyText>
                 )}
+                {moodReflect && <DailyReflect>{moodReflect}</DailyReflect>}
               </DailyBanner>
 
               {fortune && (
@@ -621,129 +646,111 @@ export default function MoodApp() {
           {/* ---- 편지(결과) ---- */}
           {stage === "result" && mood && rc && (
             <>
-              <div
-                className="letter-card"
-                style={{
-                  background: `linear-gradient(160deg, ${mood.color}18 0%, rgba(255,255,255,0.9) 92%)`,
-                  border: `1px solid ${mood.color}44`,
-                }}
-              >
+              <LetterCard style={{ border: `1px solid ${mood.color}44` }}>
                 {rc.profile && (
-                  <div className="report">
-                    <p className="report-label">🧭 오늘의 마음 진단 결과</p>
-                    <p className="report-type">
-                      <span className="report-emoji">{rc.profile.emoji}</span>
+                  <Report>
+                    <ReportLabel>🧭 오늘의 마음 진단 결과</ReportLabel>
+                    <ReportType>
+                      <ReportEmoji>{rc.profile.emoji}</ReportEmoji>
                       {rc.profile.label}
-                    </p>
-                    <div className="report-score">
-                      <div className="report-score-top">
+                    </ReportType>
+                    <ReportScore>
+                      <ReportScoreTop>
                         <span>마음 점수</span>
-                        <span className="report-score-num">
+                        <ReportScoreNum>
                           {moodScore(rc.profile.avg)}점
-                        </span>
-                      </div>
-                      <div className="report-bar">
-                        <span
-                          className="report-bar-fill"
-                          style={{
-                            width: `${moodScore(rc.profile.avg)}%`,
-                            background: mood.color,
-                          }}
+                        </ReportScoreNum>
+                      </ReportScoreTop>
+                      <ReportBar>
+                        <ReportBarFill
+                          style={{ width: `${moodScore(rc.profile.avg)}%` }}
                         />
-                      </div>
-                    </div>
-                    <p className="report-summary">{rc.profile.summary}</p>
-                  </div>
+                      </ReportBar>
+                    </ReportScore>
+                    <ReportSummary>{rc.profile.summary}</ReportSummary>
+                  </Report>
                 )}
 
                 {analysis && (
-                  <div className="reading">
-                    <p className="reading-label">🔎 상담 소견</p>
-                    <p className="reading-read">{analysis.read}</p>
-                    <div className="reading-suggest">
-                      <span className="reading-suggest-tag">🌱 오늘의 제안</span>
-                      <span className="reading-suggest-text">
-                        {analysis.suggestion}
-                      </span>
-                    </div>
+                  <Reading>
+                    <ReadingLabel>🔎 상담 소견</ReadingLabel>
+                    <ReadingRead>{analysis.read}</ReadingRead>
+                    <ReadingSuggest>
+                      <ReadingSuggestTag>🌱 오늘의 제안</ReadingSuggestTag>
+                      <ReadingSuggestText>{analysis.suggestion}</ReadingSuggestText>
+                    </ReadingSuggest>
                     {analysis.caution && (
-                      <p className="reading-caution">{analysis.caution}</p>
+                      <ReadingCaution>{analysis.caution}</ReadingCaution>
                     )}
-                  </div>
+                  </Reading>
                 )}
 
-                <div className="letter-from">
-                  <img className="letter-avatar-img" src={persona.avatar} alt="" />
-                  <span className="letter-fromtext">
+                <LetterFrom>
+                  <LetterAvatarImg src={persona.avatar} alt="" />
+                  <LetterFromText>
                     {persona.name}
-                    <span className="letter-tag"> · {persona.tagline}</span>
-                  </span>
-                </div>
+                    <LetterTag> · {persona.tagline}</LetterTag>
+                  </LetterFromText>
+                </LetterFrom>
 
-                <p className="letter-open">{acknowledgment(mood.id, intensity)}</p>
+                <LetterOpen>{acknowledgment(mood.id, intensity)}</LetterOpen>
 
                 {note.trim() && (
-                  <p className="letter-echo">
+                  <LetterEcho>
                     “{note.trim()}”
-                    <span className="letter-echo-tail">
+                    <LetterEchoTail>
                       그 마음, 여기 그대로 받아둘게요.
-                    </span>
-                  </p>
+                    </LetterEchoTail>
+                  </LetterEcho>
                 )}
                 {reflectNote(note) && (
-                  <p className="letter-reflect">💡 {reflectNote(note)}</p>
+                  <LetterReflect>💡 {reflectNote(note)}</LetterReflect>
                 )}
 
-                <p className="letter-line dim">{rc.opener}</p>
-                <p className="letter-body">{rc.message}</p>
-                <p className="letter-line dim">{rc.closer}</p>
+                <LetterLine $dim>{rc.opener}</LetterLine>
+                <LetterBody>{rc.message}</LetterBody>
+                <LetterLine $dim>{rc.closer}</LetterLine>
 
-                <div className="quote-block" style={{ borderColor: `${mood.color}44` }}>
-                  <p className="quote-text">“{rc.quote.text}”</p>
-                  <p className="quote-author">— {rc.quote.author}</p>
-                </div>
+                <QuoteBlock style={{ borderColor: `${mood.color}44` }}>
+                  <QuoteText>“{rc.quote.text}”</QuoteText>
+                  <QuoteAuthor>— {rc.quote.author}</QuoteAuthor>
+                </QuoteBlock>
 
                 {rc.profile?.gentleSupport && (
-                  <p className="support-note">{rc.profile.gentleSupport}</p>
+                  <SupportNote>{rc.profile.gentleSupport}</SupportNote>
                 )}
 
-                <p className="letter-sign">— {persona.name} 드림</p>
+                <LetterSign>— {persona.name} 드림</LetterSign>
 
-                <div className="ps-box">
-                  <p className="ps-label">🌙 오늘의 나에게 한마디</p>
+                <PsBox>
+                  <PsLabel>🌙 오늘의 나에게 한마디</PsLabel>
                   {selfSaved ? (
-                    <p className="ps-saved">“{selfNote}”</p>
+                    <PsSaved>“{selfNote}”</PsSaved>
                   ) : (
                     <>
-                      <textarea
-                        className="free-input"
+                      <FreeInput
                         rows={2}
                         placeholder="스스로에게 건네고 싶은 말을 적어보세요."
                         value={selfNote}
                         onChange={(e) => setSelfNote(e.target.value)}
                       />
-                      <button
-                        className="ps-btn"
-                        onClick={saveSelf}
-                        disabled={!selfNote.trim()}
-                      >
+                      <PsBtn onClick={saveSelf} disabled={!selfNote.trim()}>
                         남기기
-                      </button>
+                      </PsBtn>
                     </>
                   )}
-                </div>
+                </PsBox>
 
-                <p className="disclaimer">
+                <Disclaimer>
                   이 체크인은 의학적 진단이 아니라, 오늘의 마음을 돌아보기 위한 가벼운
                   기록이에요.
-                </p>
-              </div>
+                </Disclaimer>
+              </LetterCard>
 
-              <div className="explore">
-                <p className="explore-label">🧭 이 마음, 웹에서 더 둘러보기</p>
-                <div className="explore-links">
-                  <a
-                    className="explore-link"
+              <Explore>
+                <ExploreLabel>🧭 이 마음, 웹에서 더 둘러보기</ExploreLabel>
+                <ExploreLinks>
+                  <ExploreLink
                     target="_blank"
                     rel="noopener noreferrer"
                     href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
@@ -751,9 +758,8 @@ export default function MoodApp() {
                     )}`}
                   >
                     🎧 어울리는 음악
-                  </a>
-                  <a
-                    className="explore-link"
+                  </ExploreLink>
+                  <ExploreLink
                     target="_blank"
                     rel="noopener noreferrer"
                     href={`https://www.google.com/search?q=${encodeURIComponent(
@@ -761,9 +767,8 @@ export default function MoodApp() {
                     )}`}
                   >
                     📖 위로가 되는 글
-                  </a>
-                  <a
-                    className="explore-link"
+                  </ExploreLink>
+                  <ExploreLink
                     target="_blank"
                     rel="noopener noreferrer"
                     href={`https://www.google.com/search?q=${encodeURIComponent(
@@ -771,32 +776,28 @@ export default function MoodApp() {
                     )}`}
                   >
                     🌿 마음 다스리기
-                  </a>
-                </div>
-              </div>
+                  </ExploreLink>
+                </ExploreLinks>
+              </Explore>
 
-              <div className="actions">
-                <button className="btn" onClick={changePersona}>
-                  다른 사람에게 받기 🔀
-                </button>
-                <button className="btn" onClick={drawAgain}>
-                  다른 한마디 🔄
-                </button>
-                <button className="btn" onClick={saveCurrent} disabled={justSaved}>
+              <Actions>
+                <Btn onClick={changePersona}>다른 사람에게 받기 🔀</Btn>
+                <Btn onClick={drawAgain}>다른 한마디 🔄</Btn>
+                <Btn onClick={saveCurrent} disabled={justSaved}>
                   {justSaved ? "담았어요 ✓" : "마음에 담기 🔖"}
-                </button>
+                </Btn>
                 {shareData && <ShareCard data={shareData} />}
-                <button className="btn btn-primary" onClick={resetFlow}>
+                <Btn $primary onClick={resetFlow}>
                   처음으로
-                </button>
-              </div>
+                </Btn>
+              </Actions>
 
-              <p className="footer">
+              <Footer>
                 {dateText ? `${dateText} · ` : ""}
                 {streak > 0
                   ? `${streak}일째 마음을 들여다보는 중 🌱`
                   : "오늘 기록을 남겼어요 🌱"}
-              </p>
+              </Footer>
             </>
           )}
         </>
@@ -807,40 +808,32 @@ export default function MoodApp() {
       )}
 
       {tab === "saved" && (
-        <div className="saved-wrap">
+        <SavedWrap>
           {saved.length === 0 ? (
-            <p className="cal-empty-msg">
+            <CalEmptyMsg>
               아직 담은 문장이 없어요. 마음에 드는 한마디를 만나면 “마음에 담기 🔖”로 모아보세요.
-            </p>
+            </CalEmptyMsg>
           ) : (
             saved.map((s) => (
-              <div
-                key={s.id}
-                className="saved-card"
-                style={{ borderColor: `${s.color}44` }}
-              >
-                <div className="saved-top">
-                  <span className="saved-emoji">{s.emoji}</span>
-                  <span className="saved-date">
+              <SavedCard key={s.id} style={{ borderColor: `${s.color}44` }}>
+                <SavedTop>
+                  <SavedEmoji>{s.emoji}</SavedEmoji>
+                  <SavedDate>
                     {s.dateKey} · {s.caption}
-                  </span>
-                  <button
-                    className="saved-del"
-                    onClick={() => deleteSaved(s.id)}
-                    aria-label="삭제"
-                  >
+                  </SavedDate>
+                  <SavedDel onClick={() => deleteSaved(s.id)} aria-label="삭제">
                     ✕
-                  </button>
-                </div>
-                <p className="saved-message">{s.message}</p>
-                <p className="saved-quote">
+                  </SavedDel>
+                </SavedTop>
+                <SavedMessage>{s.message}</SavedMessage>
+                <SavedQuote>
                   “{s.quoteText}”{" "}
-                  <span className="saved-qauthor">— {s.quoteAuthor}</span>
-                </p>
-              </div>
+                  <SavedQAuthor>— {s.quoteAuthor}</SavedQAuthor>
+                </SavedQuote>
+              </SavedCard>
             ))
           )}
-        </div>
+        </SavedWrap>
       )}
     </>
   );

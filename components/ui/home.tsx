@@ -35,7 +35,12 @@ export const DailyText = tw.p`
 `;
 
 export const DailyAuthor = tw.p`
-  font-hand mt-2.5 text-right text-[13px] text-ink-soft
+  font-hand mt-2.5 text-right text-[17px] text-ink-soft
+`;
+
+export const DailyReflect = tw.p`
+  font-soft mt-4 pt-3.5 border-t border-[rgba(176,137,95,0.28)]
+  text-[14px] font-semibold leading-[1.6] text-[#7c5a34] [word-break:keep-all]
 `;
 
 export const SectionLabel = tw.p`
@@ -84,7 +89,7 @@ export const PersonaTag = tw.span`
 `;
 
 export const MoodGrid = tw.div`
-  grid grid-cols-2 gap-3
+  grid grid-cols-1 sm:grid-cols-2 gap-3
 `;
 
 export const MoodBtn = tw.button`
@@ -107,7 +112,8 @@ export const MoodCopy = tw.span`
 `;
 
 export const MoodName = tw.span`
-  font-soft text-left text-[17px] leading-[1.3] font-bold tracking-[-0.01em] text-[#33291f]
+  font-soft text-left text-[17px] leading-[1.3] font-bold tracking-[-0.01em]
+  text-[#33291f] [word-break:keep-all]
 `;
 
 export const MoodCaption = tw.span`

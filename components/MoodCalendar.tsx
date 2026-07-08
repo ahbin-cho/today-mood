@@ -5,6 +5,14 @@ import { moods } from "@/data/moods";
 import { reflectNote } from "@/data/checkin";
 import { dateKey, type JournalMap, type Entry } from "@/lib/storage";
 import { kst, fmtTime } from "@/lib/time";
+import {
+  CalWrap, CalHead, CalTitle, CalNav, CalSub, CalGrid, CalWeekRow, CalWeekday,
+  CalCell, CalCellEmpty, CalDay, CalEmoji, CalCount, CalEmptyMsg, DayDetailList,
+  DayDetailCount, DayDetail, DayDetailHead, DayDetailEmoji, DayDetailDate,
+  DayDetailType, DayDetailLine, QaList, QaRow, QaQ, QaA, DayDetailNote,
+  DayDetailReflect, DayDetailReading, DayDetailSuggest, DayDetailMessage,
+  DayDetailQuote, DayDetailSign, DayDetailSelf,
+} from "@/components/ui/calendar";
 
 const moodById = Object.fromEntries(moods.map((m) => [m.id, m]));
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
@@ -59,32 +67,30 @@ export default function MoodCalendar({
   const selectedEntries = selected ? journal[selected] : undefined;
 
   return (
-    <div className="cal-wrap">
-      <div className="cal-head">
-        <button className="cal-nav" onClick={() => shift(-1)} aria-label="이전 달">
+    <CalWrap>
+      <CalHead>
+        <CalNav onClick={() => shift(-1)} aria-label="이전 달">
           ‹
-        </button>
-        <div className="cal-title">
+        </CalNav>
+        <CalTitle>
           {view.year}년 {view.month + 1}월
-        </div>
-        <button className="cal-nav" onClick={() => shift(1)} aria-label="다음 달">
+        </CalTitle>
+        <CalNav onClick={() => shift(1)} aria-label="다음 달">
           ›
-        </button>
-      </div>
+        </CalNav>
+      </CalHead>
 
-      <p className="cal-sub">이 달에 마음을 {monthlyCount}번 기록했어요.</p>
+      <CalSub>이 달에 마음을 {monthlyCount}번 기록했어요.</CalSub>
 
-      <div className="cal-grid cal-weekrow">
+      <CalWeekRow>
         {WEEK.map((w) => (
-          <div key={w} className="cal-weekday">
-            {w}
-          </div>
+          <CalWeekday key={w}>{w}</CalWeekday>
         ))}
-      </div>
+      </CalWeekRow>
 
-      <div className="cal-grid">
+      <CalGrid>
         {cells.map((d, i) => {
-          if (d === null) return <div key={i} className="cal-cell empty" />;
+          if (d === null) return <CalCellEmpty key={i} />;
           const k = keyFor(d);
           const dayEntries = journal[k];
           const entry = dayEntries?.[dayEntries.length - 1]; // 그날 가장 최근 기록
@@ -93,11 +99,11 @@ export default function MoodCalendar({
           const isToday = k === todayKey;
           const isSel = k === selected;
           return (
-            <button
+            <CalCell
               key={i}
-              className={`cal-cell${isToday ? " today" : ""}${isSel ? " sel" : ""}${
-                mood ? " has" : ""
-              }`}
+              $has={!!mood}
+              $today={isToday}
+              $sel={isSel}
               style={
                 mood
                   ? { background: mood.bg[1], borderColor: `${mood.color}55` }
@@ -106,27 +112,27 @@ export default function MoodCalendar({
               title={mood ? mood.label : ""}
               onClick={() => count > 0 && setSelected(isSel ? null : k)}
             >
-              <span className="cal-day">{d}</span>
-              {mood && <span className="cal-emoji">{mood.emoji}</span>}
-              {count > 1 && <span className="cal-count">{count}</span>}
-            </button>
+              <CalDay>{d}</CalDay>
+              {mood && <CalEmoji>{mood.emoji}</CalEmoji>}
+              {count > 1 && <CalCount>{count}</CalCount>}
+            </CalCell>
           );
         })}
-      </div>
+      </CalGrid>
 
       {monthlyCount === 0 && (
-        <p className="cal-empty-msg">
+        <CalEmptyMsg>
           아직 이 달의 기록이 없어요. 기분을 고르면 여기에 마음 날씨가 쌓여요. 🌤️
-        </p>
+        </CalEmptyMsg>
       )}
 
       {/* 날짜 상세 다시보기 — 그날의 여러 기록을 모두 목록으로 */}
       {selectedEntries && selectedEntries.length > 0 && (
-        <div className="day-detail-list">
+        <DayDetailList>
           {selectedEntries.length > 1 && (
-            <p className="day-detail-count">
+            <DayDetailCount>
               {selected} · 이 날 {selectedEntries.length}번 기록했어요
-            </p>
+            </DayDetailCount>
           )}
           {selectedEntries.map((entry, idx) => (
             <DayEntryDetail
@@ -136,9 +142,9 @@ export default function MoodCalendar({
               index={selectedEntries.length > 1 ? idx + 1 : undefined}
             />
           ))}
-        </div>
+        </DayDetailList>
       )}
-    </div>
+    </CalWrap>
   );
 }
 
@@ -155,63 +161,59 @@ function DayEntryDetail({
   if (!mood) return null;
   const time = fmtTime(entry.ts);
   return (
-    <div className="day-detail" style={{ borderColor: `${mood.color}55` }}>
-      <div className="day-detail-head">
-        <span className="day-detail-emoji">{entry.typeEmoji || mood.emoji}</span>
+    <DayDetail style={{ borderColor: `${mood.color}55` }}>
+      <DayDetailHead>
+        <DayDetailEmoji>{entry.typeEmoji || mood.emoji}</DayDetailEmoji>
         <div>
-          <p className="day-detail-date">
+          <DayDetailDate>
             {index ? `${index}번째 기록` : date}
             {time ? ` · ${time}` : ""}
-          </p>
-          <p className="day-detail-type">{entry.typeLabel || mood.label}</p>
+          </DayDetailDate>
+          <DayDetailType>{entry.typeLabel || mood.label}</DayDetailType>
         </div>
-      </div>
+      </DayDetailHead>
 
       {typeof entry.intensity === "number" && (
-        <p className="day-detail-line">
-          강도 · {INTENSITY_LABELS[entry.intensity]}
-        </p>
+        <DayDetailLine>강도 · {INTENSITY_LABELS[entry.intensity]}</DayDetailLine>
       )}
 
       {entry.qa && entry.qa.length > 0 && (
-        <div className="qa-list">
+        <QaList>
           {entry.qa.map((item, i) => (
-            <div className="qa-row" key={i}>
-              <span className="qa-q">{item.q}</span>
-              <span className="qa-a">{item.a}</span>
-            </div>
+            <QaRow key={i}>
+              <QaQ>{item.q}</QaQ>
+              <QaA>{item.a}</QaA>
+            </QaRow>
           ))}
-        </div>
+        </QaList>
       )}
 
-      {entry.note && <p className="day-detail-note">✍️ {entry.note}</p>}
+      {entry.note && <DayDetailNote>✍️ {entry.note}</DayDetailNote>}
       {entry.note && reflectNote(entry.note) && (
-        <p className="day-detail-reflect">💡 {reflectNote(entry.note)}</p>
+        <DayDetailReflect>💡 {reflectNote(entry.note)}</DayDetailReflect>
       )}
 
       {entry.analysisRead && (
-        <p className="day-detail-reading">🔎 {entry.analysisRead}</p>
+        <DayDetailReading>🔎 {entry.analysisRead}</DayDetailReading>
       )}
       {entry.analysisSuggestion && (
-        <p className="day-detail-suggest">🌱 {entry.analysisSuggestion}</p>
+        <DayDetailSuggest>🌱 {entry.analysisSuggestion}</DayDetailSuggest>
       )}
-      {entry.message && <p className="day-detail-message">{entry.message}</p>}
+      {entry.message && <DayDetailMessage>{entry.message}</DayDetailMessage>}
       {entry.quoteText && (
-        <p className="day-detail-quote">
+        <DayDetailQuote>
           “{entry.quoteText}”
           {entry.quoteAuthor ? (
-            <span className="saved-qauthor"> — {entry.quoteAuthor}</span>
+            <span className="opacity-70"> — {entry.quoteAuthor}</span>
           ) : null}
-        </p>
+        </DayDetailQuote>
       )}
       {entry.personaName && (
-        <p className="day-detail-sign">— {entry.personaName} 드림</p>
+        <DayDetailSign>— {entry.personaName} 드림</DayDetailSign>
       )}
       {entry.selfNote && (
-        <p className="day-detail-self">
-          🌙 오늘의 나에게 · “{entry.selfNote}”
-        </p>
+        <DayDetailSelf>🌙 오늘의 나에게 · “{entry.selfNote}”</DayDetailSelf>
       )}
-    </div>
+    </DayDetail>
   );
 }

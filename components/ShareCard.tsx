@@ -2,6 +2,38 @@
 
 import { useRef, useState } from "react";
 import { toBlob } from "html-to-image";
+import tw from "tailwind-styled-components";
+
+const ShareWrap = tw.div`w-full grid gap-3.5`;
+const Preview = tw.div`
+  relative overflow-hidden rounded-[28px] min-h-[520px]
+  border border-[rgba(175,152,123,0.34)]
+  bg-[linear-gradient(180deg,#f4eadc_0%,#efe3d2_100%)]
+  shadow-[0_22px_54px_rgba(81,61,37,0.12)]
+  after:content-[''] after:absolute after:inset-0
+  after:bg-[linear-gradient(180deg,rgba(249,243,236,0.08)_0%,rgba(249,243,236,0.82)_48%,rgba(249,243,236,0.96)_100%)]
+`;
+const Art = tw.img`absolute inset-0 w-full h-full object-cover`;
+const Sheet = tw.div`
+  relative z-[1] rounded-[24px] text-center
+  bg-[rgba(251,248,242,0.9)] border border-[rgba(183,163,138,0.38)]
+  shadow-[0_16px_36px_rgba(81,61,37,0.08)]
+  mt-[168px] mx-2.5 mb-2.5 pt-4 px-3.5 pb-3.5
+  sm:mt-[220px] sm:mx-[26px] sm:mb-[26px] sm:pt-[26px] sm:px-6 sm:pb-[22px]
+`;
+const Label = tw.p`text-xs font-bold tracking-[0.08em] text-[#9b8875] mb-2.5`;
+const Emoji = tw.p`text-[38px] leading-none mb-3`;
+const Caption = tw.p`font-soft text-2xl leading-[1.45] tracking-[-0.01em] text-[#332c26] mb-3.5 [word-break:keep-all]`;
+const Message = tw.p`text-[15px] leading-[1.75] text-[#5d5146] [word-break:keep-all]`;
+const Quote = tw.div`mt-[18px] rounded-[20px] border border-[rgba(183,163,138,0.42)] bg-white/[0.56] py-4 px-[18px]`;
+const QuoteP = tw.p`text-[15px] leading-[1.7] text-[#4b4239] [word-break:keep-all]`;
+const QuoteSpan = tw.span`block mt-2.5 text-[12.5px] font-bold text-[#7f6e5d]`;
+const CardDate = tw.p`mt-[18px] text-[12.5px] font-bold text-[#685a4d]`;
+const SaveBtn = tw.button`
+  py-[13px] rounded-[14px] text-sm font-bold cursor-pointer
+  border border-line bg-white/85 text-ink
+  transition-[transform,box-shadow] duration-200 disabled:opacity-60
+`;
 
 export type ShareCardData = {
   imageSrc?: string;
@@ -272,7 +304,7 @@ export default function ShareCard({ data }: { data: ShareCardData }) {
         const clone = node.cloneNode(true) as HTMLElement;
         clone.style.width = `${CARD_W}px`;
         // 모바일 미디어쿼리로 줄어든 시트 여백을 데스크톱 값으로 되돌림
-        const sheet = clone.querySelector<HTMLElement>(".share-card-sheet");
+        const sheet = clone.querySelector<HTMLElement>("[data-sheet]");
         if (sheet) {
           sheet.style.setProperty("margin", "220px 26px 26px", "important");
           sheet.style.setProperty("padding", "26px 24px 22px", "important");
@@ -281,7 +313,7 @@ export default function ShareCard({ data }: { data: ShareCardData }) {
         document.body.appendChild(host);
 
         // 일러스트가 다 로드된 뒤 캡처
-        const art = clone.querySelector<HTMLImageElement>(".share-card-art");
+        const art = clone.querySelector<HTMLImageElement>("[data-art]");
         if (art && !art.complete) {
           await new Promise((r) => {
             art.onload = r;
@@ -310,26 +342,26 @@ export default function ShareCard({ data }: { data: ShareCardData }) {
   };
 
   return (
-    <div className="share-card-wrap">
-      <div className="share-card-preview" ref={previewRef}>
+    <ShareWrap>
+      <Preview ref={previewRef}>
         {data.imageSrc && (
-          <img className="share-card-art" src={data.imageSrc} alt="" crossOrigin="anonymous" />
+          <Art data-art src={data.imageSrc} alt="" crossOrigin="anonymous" />
         )}
-        <div className="share-card-sheet">
-          <p className="share-card-label">오늘의 마음 기록</p>
-          <p className="share-card-emoji">{data.emoji}</p>
-          <p className="share-card-caption">{data.caption}</p>
-          <p className="share-card-message">{data.message}</p>
-          <div className="share-card-quote">
-            <p>“{data.quoteText}”</p>
-            <span>— {data.quoteAuthor}</span>
-          </div>
-          <p className="share-card-date">{data.dateText}</p>
-        </div>
-      </div>
-      <button className="btn" onClick={handleSave} disabled={busy}>
+        <Sheet data-sheet>
+          <Label>오늘의 마음 기록</Label>
+          <Emoji>{data.emoji}</Emoji>
+          <Caption>{data.caption}</Caption>
+          <Message>{data.message}</Message>
+          <Quote>
+            <QuoteP>“{data.quoteText}”</QuoteP>
+            <QuoteSpan>— {data.quoteAuthor}</QuoteSpan>
+          </Quote>
+          <CardDate>{data.dateText}</CardDate>
+        </Sheet>
+      </Preview>
+      <SaveBtn onClick={handleSave} disabled={busy}>
         {busy ? "만드는 중…" : "카드로 저장"}
-      </button>
-    </div>
+      </SaveBtn>
+    </ShareWrap>
   );
 }
