@@ -37,6 +37,20 @@ import { kst } from "@/lib/time";
 import { getDeviceId } from "@/lib/uid";
 import { pullMoodState, pushMoodState } from "@/lib/cloud";
 import ShareCard, { type ShareCardData } from "@/components/ShareCard";
+import {
+  Tabs, Tab, DailyBanner, DailyLabel, DailyText, DailyAuthor, SectionLabel,
+  Footer, PersonaRow, PersonaChip, PersonaPhoto, PersonaCopy, PersonaName,
+  PersonaTag, MoodGrid, MoodBtn, MoodEmoji, MoodCopy, MoodName, MoodCaption,
+  MoodLine, FortuneCard, FortuneHead, FortuneLine, FortuneGauge, FortuneGaugeTop,
+  FortuneScore, FortuneBar, FortuneBarFill, FortuneFlow, FortuneGrid, FortuneItem,
+  FortuneKey, FortuneVal, FortuneSwatch, FortuneTip, FortuneNote,
+} from "@/components/ui/home";
+import {
+  StepCard, Advisor, AdvisorPhoto, AdvisorCopy, AdvisorName, AdvisorTag,
+  AdvisorBadge, StepHead, StepBack, StepSkip, StepDots, Dot, StepEmoji,
+  StepTitle, StepSub, IntensityValue, SliderEnds, FreeBtn, FreeInput,
+  Choices, Choice,
+} from "@/components/ui/step";
 import MoodCalendar from "@/components/MoodCalendar";
 
 const DEFAULT_BG: [string, string] = ["#FBF6EE", "#F3E9DB"];
@@ -392,152 +406,131 @@ export default function MoodApp() {
 
   return (
     <>
-      <nav className="tabs">
-        <button
-          className={`tab${tab === "today" ? " on" : ""}`}
+      <Tabs>
+        <Tab
+          $on={tab === "today"}
           onClick={() => {
             setTab("today");
-            resetFlow(); // 어느 화면에서든 '오늘'을 누르면 홈으로
+            resetFlow();
           }}
         >
           오늘
-        </button>
-        <button
-          className={`tab${tab === "calendar" ? " on" : ""}`}
-          onClick={() => setTab("calendar")}
-        >
+        </Tab>
+        <Tab $on={tab === "calendar"} onClick={() => setTab("calendar")}>
           마음 날씨
-        </button>
-        <button
-          className={`tab${tab === "saved" ? " on" : ""}`}
-          onClick={() => setTab("saved")}
-        >
+        </Tab>
+        <Tab $on={tab === "saved"} onClick={() => setTab("saved")}>
           담은 문장{saved.length > 0 ? ` (${saved.length})` : ""}
-        </button>
-      </nav>
+        </Tab>
+      </Tabs>
 
       {tab === "today" && (
         <>
           {stage === "home" && (
             <>
-              <div className="daily-banner">
-                <p className="daily-label">⭐ 오늘의 한마디</p>
+              <DailyBanner>
+                <DailyLabel>⭐ 오늘의 한마디</DailyLabel>
                 {daily ? (
                   <>
-                    <p className="daily-text">“{daily.text}”</p>
-                    <p className="daily-author">— {daily.author}</p>
+                    <DailyText>“{daily.text}”</DailyText>
+                    <DailyAuthor>— {daily.author}</DailyAuthor>
                   </>
                 ) : (
-                  <p className="daily-text dim">오늘의 한마디를 불러오는 중…</p>
+                  <DailyText className="opacity-60">오늘의 한마디를 불러오는 중…</DailyText>
                 )}
-              </div>
+              </DailyBanner>
 
               {fortune && (
-                <div className="fortune-card">
-                  <p className="fortune-head">🔮 오늘의 마음 운세</p>
-                  <p className="fortune-line">“{fortune.line}”</p>
+                <FortuneCard>
+                  <FortuneHead>🔮 오늘의 마음 운세</FortuneHead>
+                  <FortuneLine>“{fortune.line}”</FortuneLine>
 
-                  <div className="fortune-gauge">
-                    <div className="fortune-gauge-top">
+                  <FortuneGauge>
+                    <FortuneGaugeTop>
                       <span>오늘의 마음 기운</span>
-                      <span className="fortune-score">{fortune.score}점</span>
-                    </div>
-                    <div className="fortune-bar">
-                      <span
-                        className="fortune-bar-fill"
-                        style={{ width: `${fortune.score}%` }}
-                      />
-                    </div>
-                  </div>
+                      <FortuneScore>{fortune.score}점</FortuneScore>
+                    </FortuneGaugeTop>
+                    <FortuneBar>
+                      <FortuneBarFill style={{ width: `${fortune.score}%` }} />
+                    </FortuneBar>
+                  </FortuneGauge>
 
-                  <p className="fortune-flow">
+                  <FortuneFlow>
                     {fortune.personalized ? "🌱 " : "✍️ "}
                     {fortune.flow}
-                  </p>
+                  </FortuneFlow>
 
-                  <div className="fortune-grid">
-                    <div className="fortune-item">
-                      <span className="fortune-key">행운의 색</span>
-                      <span className="fortune-val">
-                        <span
-                          className="fortune-swatch"
-                          style={{ background: fortune.color.hex }}
-                        />
+                  <FortuneGrid>
+                    <FortuneItem>
+                      <FortuneKey>행운의 색</FortuneKey>
+                      <FortuneVal>
+                        <FortuneSwatch style={{ background: fortune.color.hex }} />
                         {fortune.color.name}
-                      </span>
-                    </div>
-                    <div className="fortune-item">
-                      <span className="fortune-key">행운의 시간</span>
-                      <span className="fortune-val">{fortune.time}</span>
-                    </div>
-                    <div className="fortune-item">
-                      <span className="fortune-key">오늘의 아이템</span>
-                      <span className="fortune-val">{fortune.item}</span>
-                    </div>
-                    <div className="fortune-item">
-                      <span className="fortune-key">오늘의 키워드</span>
-                      <span className="fortune-val">#{fortune.keyword}</span>
-                    </div>
-                  </div>
+                      </FortuneVal>
+                    </FortuneItem>
+                    <FortuneItem>
+                      <FortuneKey>행운의 시간</FortuneKey>
+                      <FortuneVal>{fortune.time}</FortuneVal>
+                    </FortuneItem>
+                    <FortuneItem>
+                      <FortuneKey>오늘의 아이템</FortuneKey>
+                      <FortuneVal>{fortune.item}</FortuneVal>
+                    </FortuneItem>
+                    <FortuneItem>
+                      <FortuneKey>오늘의 키워드</FortuneKey>
+                      <FortuneVal>#{fortune.keyword}</FortuneVal>
+                    </FortuneItem>
+                  </FortuneGrid>
 
-                  <p className="fortune-tip">🍀 오늘의 작은 처방 · {fortune.tip}</p>
-                  <p className="fortune-note">
+                  <FortuneTip>🍀 오늘의 작은 처방 · {fortune.tip}</FortuneTip>
+                  <FortuneNote>
                     * 재미로 보는 운세예요. 내 기록이 쌓일수록 기운 점수가 더 맞춰져요.
-                  </p>
-                </div>
+                  </FortuneNote>
+                </FortuneCard>
               )}
 
-              <p className="section-label">오늘의 마음을 누구와 살펴볼까요?</p>
-              <div className="persona-row">
-                {personas.map((p) => (
-                  <button
-                    key={p.id}
-                    className={`persona-chip${p.id === personaId ? " on" : ""}`}
-                    onClick={() => choosePersona(p.id)}
-                  >
-                    <img className="persona-photo" src={p.avatar} alt="" />
-                    <span className="persona-copy">
-                      <span className="persona-name">{p.name}</span>
-                      <span className="persona-tag">{p.tagline}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
+              <SectionLabel>오늘의 마음을 누구와 살펴볼까요?</SectionLabel>
+              <PersonaRow>
+                {personas.map((p) => {
+                  const on = p.id === personaId;
+                  return (
+                    <PersonaChip key={p.id} $on={on} onClick={() => choosePersona(p.id)}>
+                      <PersonaPhoto src={p.avatar} alt="" />
+                      <PersonaCopy>
+                        <PersonaName $on={on}>{p.name}</PersonaName>
+                        <PersonaTag>{p.tagline}</PersonaTag>
+                      </PersonaCopy>
+                    </PersonaChip>
+                  );
+                })}
+              </PersonaRow>
 
-              <p className="section-label">지금 마음과 가장 가까운 문장을 골라보세요</p>
-              <div className="mood-grid">
+              <SectionLabel>지금 마음과 가장 가까운 문장을 골라보세요</SectionLabel>
+              <MoodGrid>
                 {moods.map((m) => (
-                  <button
-                    key={m.id}
-                    className="mood-btn"
-                    onClick={() => startFlow(m)}
-                  >
-                    <span className="mood-emoji" aria-hidden="true">{m.emoji}</span>
-                    <span className="mood-copy">
-                      <span className="mood-name">{m.label}</span>
-                      <span className="mood-caption">{m.caption}</span>
-                    </span>
-                    <span
-                      className="mood-line"
-                      style={{ background: m.color }}
-                      aria-hidden="true"
-                    />
-                  </button>
+                  <MoodBtn key={m.id} onClick={() => startFlow(m)}>
+                    <MoodEmoji aria-hidden="true">{m.emoji}</MoodEmoji>
+                    <MoodCopy>
+                      <MoodName>{m.label}</MoodName>
+                      <MoodCaption>{m.caption}</MoodCaption>
+                    </MoodCopy>
+                    <MoodLine style={{ background: m.color }} aria-hidden="true" />
+                  </MoodBtn>
                 ))}
-              </div>
+              </MoodGrid>
 
-              <p className="footer">
+              <Footer>
                 {dateText ? `${dateText} · ` : ""}
                 {streak > 0
                   ? `${streak}일째 마음을 들여다보는 중 🌱`
                   : "오늘 하루도 당신의 마음을 응원해요."}
-              </p>
+              </Footer>
             </>
           )}
 
           {/* ---- 강도 ---- */}
           {stage === "intensity" && mood && (
-            <div className="step-card">
+            <StepCard>
               <StepAdvisor persona={persona} />
               <StepHeader
                 step={1}
@@ -545,9 +538,9 @@ export default function MoodApp() {
                 onBack={resetFlow}
                 onSkip={() => enterResult(note)}
               />
-              <div className="step-emoji">{mood.emoji}</div>
-              <p className="step-title">“{mood.label}”, 얼마나 그런가요?</p>
-              <p className="intensity-value">{INTENSITY_LABELS[intensity]}</p>
+              <StepEmoji>{mood.emoji}</StepEmoji>
+              <StepTitle>“{mood.label}”, 얼마나 그런가요?</StepTitle>
+              <IntensityValue>{INTENSITY_LABELS[intensity]}</IntensityValue>
               <input
                 className="slider"
                 type="range"
@@ -558,22 +551,17 @@ export default function MoodApp() {
                 onChange={(e) => setIntensity(Number(e.target.value))}
                 style={{ accentColor: mood.color }}
               />
-              <div className="slider-ends">
+              <SliderEnds>
                 <span>살짝</span>
                 <span>많이</span>
-              </div>
-              <button
-                className="free-btn"
-                onClick={() => setStage("questions")}
-              >
-                다음
-              </button>
-            </div>
+              </SliderEnds>
+              <FreeBtn onClick={() => setStage("questions")}>다음</FreeBtn>
+            </StepCard>
           )}
 
           {/* ---- 기분별 질문 ---- */}
           {stage === "questions" && mood && sessionQuestions[qIndex] && (
-            <div className="step-card">
+            <StepCard>
               <StepAdvisor persona={persona} />
               <StepHeader
                 step={qIndex + 2}
@@ -584,29 +572,29 @@ export default function MoodApp() {
                 }}
                 onSkip={() => enterResult(note)}
               />
-              <div className="step-emoji">{sessionQuestions[qIndex].emoji}</div>
-              <p className="step-title">{sessionQuestions[qIndex].title}</p>
-              <div className="choices">
+              <StepEmoji>{sessionQuestions[qIndex].emoji}</StepEmoji>
+              <StepTitle>{sessionQuestions[qIndex].title}</StepTitle>
+              <Choices>
                 {sessionQuestions[qIndex].choices.map((c) => {
                   const on = picked[qIndex]?.label === c.label;
                   return (
-                    <button
+                    <Choice
                       key={c.label}
-                      className={`choice${on ? " on" : ""}`}
+                      $on={on}
                       style={on ? { borderColor: mood.color } : undefined}
                       onClick={() => answer(qIndex, c)}
                     >
                       {c.label}
-                    </button>
+                    </Choice>
                   );
                 })}
-              </div>
-            </div>
+              </Choices>
+            </StepCard>
           )}
 
           {/* ---- 메모 ---- */}
           {stage === "note" && mood && (
-            <div className="step-card">
+            <StepCard>
               <StepAdvisor persona={persona} />
               <StepHeader
                 step={totalSteps}
@@ -617,23 +605,17 @@ export default function MoodApp() {
                 }}
                 onSkip={() => enterResult("")}
               />
-              <div className="step-emoji">✍️</div>
-              <p className="step-title">오늘 있었던 일을 한 줄로 남겨볼래요?</p>
-              <p className="step-sub">비워두어도 괜찮아요.</p>
-              <textarea
-                className="free-input"
+              <StepEmoji>✍️</StepEmoji>
+              <StepTitle>오늘 있었던 일을 한 줄로 남겨볼래요?</StepTitle>
+              <StepSub>비워두어도 괜찮아요.</StepSub>
+              <FreeInput
                 rows={3}
                 placeholder="예: 회의가 많아 정신없었지만 저녁엔 좋아하는 걸 먹었다."
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
-              <button
-                className="free-btn"
-                onClick={() => enterResult(note)}
-              >
-                편지 받기
-              </button>
-            </div>
+              <FreeBtn onClick={() => enterResult(note)}>편지 받기</FreeBtn>
+            </StepCard>
           )}
 
           {/* ---- 편지(결과) ---- */}
@@ -866,14 +848,14 @@ export default function MoodApp() {
 
 function StepAdvisor({ persona }: { persona: Persona }) {
   return (
-    <div className="step-advisor">
-      <img className="step-advisor-photo" src={persona.avatar} alt="" />
-      <span className="step-advisor-copy">
-        <span className="step-advisor-name">{persona.name}</span>
-        <span className="step-advisor-tag">{persona.tagline}</span>
-      </span>
-      <span className="step-advisor-badge">상담 중</span>
-    </div>
+    <Advisor>
+      <AdvisorPhoto src={persona.avatar} alt="" />
+      <AdvisorCopy>
+        <AdvisorName>{persona.name}</AdvisorName>
+        <AdvisorTag>{persona.tagline}</AdvisorTag>
+      </AdvisorCopy>
+      <AdvisorBadge>상담 중</AdvisorBadge>
+    </Advisor>
   );
 }
 
@@ -889,18 +871,14 @@ function StepHeader({
   onSkip: () => void;
 }) {
   return (
-    <div className="step-head">
-      <button className="step-back" onClick={onBack}>
-        ‹ 뒤로
-      </button>
-      <div className="step-dots">
+    <StepHead>
+      <StepBack onClick={onBack}>‹ 뒤로</StepBack>
+      <StepDots>
         {Array.from({ length: total }).map((_, i) => (
-          <span key={i} className={`dot${i < step ? " on" : ""}`} />
+          <Dot key={i} $on={i < step} />
         ))}
-      </div>
-      <button className="step-skip" onClick={onSkip}>
-        건너뛰기
-      </button>
-    </div>
+      </StepDots>
+      <StepSkip onClick={onSkip}>건너뛰기</StepSkip>
+    </StepHead>
   );
 }

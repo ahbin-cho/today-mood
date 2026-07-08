@@ -1,3 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+::before,
+::after {
+  border-width: 0;
+  border-style: solid;
+  border-color: var(--line);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
 :root {
   --bg: #faf7f2;
   --card: #ffffff;
@@ -948,8 +967,9 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 16px;
-  margin-bottom: 18px;
+  margin-top: 26px;
+  padding-bottom: 18px;
+  margin-bottom: 24px;
   border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
 }
 .letter-avatar {
@@ -2272,7 +2292,7 @@ body::after {
   }
 
   .letter-card {
-    padding: 22px 14px 20px !important;
+    padding: 22px 20px 20px !important;
   }
 
   .step-card {
