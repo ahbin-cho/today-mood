@@ -25,6 +25,7 @@ import {
   addSaved,
   removeSaved,
   calcStreak,
+  mergeJournals,
   saveJournalAll,
   saveSavedAll,
   type JournalMap,
@@ -32,6 +33,7 @@ import {
   type SavedItem,
   type QA,
 } from "@/lib/storage";
+import { kst } from "@/lib/time";
 import { getDeviceId } from "@/lib/uid";
 import { pullMoodState, pushMoodState } from "@/lib/cloud";
 import ShareCard, { type ShareCardData } from "@/components/ShareCard";
@@ -55,7 +57,8 @@ type ResultContent = {
 };
 
 function labelOf(d: Date): string {
-  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()} (${WEEK[d.getDay()]})`;
+  const k = kst(d);
+  return `${k.year()}. ${k.month() + 1}. ${k.date()} (${WEEK[k.day()]})`;
 }
 
 function shareArtworkForMood(moodId: string): string {
@@ -123,7 +126,7 @@ export default function MoodApp() {
     (async () => {
       const cloud = await pullMoodState(uid);
       if (cloud) {
-        const mergedJ: JournalMap = { ...cloud.journal, ...localJ };
+        const mergedJ: JournalMap = mergeJournals(cloud.journal, localJ);
         const byId = new Map<string, SavedItem>();
         [...cloud.saved, ...localS].forEach((x) => byId.set(x.id, x));
         const mergedS = Array.from(byId.values());
@@ -167,7 +170,8 @@ export default function MoodApp() {
     for (let d = 0; d < 7; d++) {
       const dd = new Date(today);
       dd.setDate(today.getDate() - d);
-      const e = journal[dateKey(dd)];
+      const dayEntries = journal[dateKey(dd)];
+      const e = dayEntries?.[dayEntries.length - 1];
       if (e) {
         recent++;
         const w =
@@ -241,6 +245,7 @@ export default function MoodApp() {
   ) => {
     if (!todayKey) return;
     const entry: Entry = {
+      ts: Date.now(),
       moodId: m.id,
       intensity,
       qa: qa.length ? qa : undefined,
@@ -266,7 +271,7 @@ export default function MoodApp() {
     const qs = buildMoodQuestions(m.id, 8);
     setMood(m);
     setIntensity(3);
-    setPersonaId(pickRandom(personas).id);
+    if (!personaId) setPersonaId(pickRandom(personas).id);
     setSessionQuestions(qs);
     setPicked(new Array(qs.length).fill(null));
     setQIndex(0);
@@ -390,7 +395,10 @@ export default function MoodApp() {
       <nav className="tabs">
         <button
           className={`tab${tab === "today" ? " on" : ""}`}
-          onClick={() => setTab("today")}
+          onClick={() => {
+            setTab("today");
+            resetFlow(); // 어느 화면에서든 '오늘'을 누르면 홈으로
+          }}
         >
           오늘
         </button>
@@ -478,6 +486,23 @@ export default function MoodApp() {
                   </p>
                 </div>
               )}
+
+              <p className="section-label">오늘의 마음을 누구와 살펴볼까요?</p>
+              <div className="persona-row">
+                {personas.map((p) => (
+                  <button
+                    key={p.id}
+                    className={`persona-chip${p.id === personaId ? " on" : ""}`}
+                    onClick={() => choosePersona(p.id)}
+                  >
+                    <img className="persona-photo" src={p.avatar} alt="" />
+                    <span className="persona-copy">
+                      <span className="persona-name">{p.name}</span>
+                      <span className="persona-tag">{p.tagline}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
 
               <p className="section-label">지금 마음과 가장 가까운 문장을 골라보세요</p>
               <div className="mood-grid">

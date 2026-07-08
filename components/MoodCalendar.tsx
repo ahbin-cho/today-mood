@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { moods } from "@/data/moods";
 import { reflectNote } from "@/data/checkin";
-import { dateKey, type JournalMap } from "@/lib/storage";
+import { dateKey, type JournalMap, type Entry } from "@/lib/storage";
+import { kst, fmtTime } from "@/lib/time";
 
 const moodById = Object.fromEntries(moods.map((m) => [m.id, m]));
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
@@ -16,10 +17,10 @@ export default function MoodCalendar({
   journal: JournalMap;
   today: Date;
 }) {
-  const [view, setView] = useState(() => ({
-    year: today.getFullYear(),
-    month: today.getMonth(),
-  }));
+  const [view, setView] = useState(() => {
+    const k = kst(today);
+    return { year: k.year(), month: k.month() };
+  });
   const [selected, setSelected] = useState<string | null>(null);
 
   const cells = useMemo(() => {
@@ -35,7 +36,9 @@ export default function MoodCalendar({
 
   const monthlyCount = useMemo(() => {
     const prefix = `${view.year}-${String(view.month + 1).padStart(2, "0")}`;
-    return Object.keys(journal).filter((k) => k.startsWith(prefix)).length;
+    return Object.entries(journal)
+      .filter(([k]) => k.startsWith(prefix))
+      .reduce((sum, [, entries]) => sum + entries.length, 0);
   }, [journal, view]);
 
   const todayKey = dateKey(today);
@@ -53,8 +56,7 @@ export default function MoodCalendar({
   const keyFor = (d: number) =>
     `${view.year}-${String(view.month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
-  const selectedEntry = selected ? journal[selected] : undefined;
-  const selectedMood = selectedEntry ? moodById[selectedEntry.moodId] : undefined;
+  const selectedEntries = selected ? journal[selected] : undefined;
 
   return (
     <div className="cal-wrap">
@@ -84,8 +86,10 @@ export default function MoodCalendar({
         {cells.map((d, i) => {
           if (d === null) return <div key={i} className="cal-cell empty" />;
           const k = keyFor(d);
-          const entry = journal[k];
+          const dayEntries = journal[k];
+          const entry = dayEntries?.[dayEntries.length - 1]; // 그날 가장 최근 기록
           const mood = entry ? moodById[entry.moodId] : undefined;
+          const count = dayEntries?.length ?? 0;
           const isToday = k === todayKey;
           const isSel = k === selected;
           return (
@@ -100,10 +104,11 @@ export default function MoodCalendar({
                   : undefined
               }
               title={mood ? mood.label : ""}
-              onClick={() => entry && setSelected(isSel ? null : k)}
+              onClick={() => count > 0 && setSelected(isSel ? null : k)}
             >
               <span className="cal-day">{d}</span>
               {mood && <span className="cal-emoji">{mood.emoji}</span>}
+              {count > 1 && <span className="cal-count">{count}</span>}
             </button>
           );
         })}
@@ -115,76 +120,97 @@ export default function MoodCalendar({
         </p>
       )}
 
-      {/* 날짜 상세 다시보기 */}
-      {selectedEntry && selectedMood && (
-        <div
-          className="day-detail"
-          style={{ borderColor: `${selectedMood.color}55` }}
-        >
-          <div className="day-detail-head">
-            <span className="day-detail-emoji">
-              {selectedEntry.typeEmoji || selectedMood.emoji}
-            </span>
-            <div>
-              <p className="day-detail-date">{selected}</p>
-              <p className="day-detail-type">
-                {selectedEntry.typeLabel || selectedMood.label}
-              </p>
-            </div>
-          </div>
-
-          {typeof selectedEntry.intensity === "number" && (
-            <p className="day-detail-line">
-              강도 · {INTENSITY_LABELS[selectedEntry.intensity]}
+      {/* 날짜 상세 다시보기 — 그날의 여러 기록을 모두 목록으로 */}
+      {selectedEntries && selectedEntries.length > 0 && (
+        <div className="day-detail-list">
+          {selectedEntries.length > 1 && (
+            <p className="day-detail-count">
+              {selected} · 이 날 {selectedEntries.length}번 기록했어요
             </p>
           )}
-
-          {selectedEntry.qa && selectedEntry.qa.length > 0 && (
-            <div className="qa-list">
-              {selectedEntry.qa.map((item, i) => (
-                <div className="qa-row" key={i}>
-                  <span className="qa-q">{item.q}</span>
-                  <span className="qa-a">{item.a}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {selectedEntry.note && (
-            <p className="day-detail-note">✍️ {selectedEntry.note}</p>
-          )}
-          {selectedEntry.note && reflectNote(selectedEntry.note) && (
-            <p className="day-detail-reflect">💡 {reflectNote(selectedEntry.note)}</p>
-          )}
-
-          {selectedEntry.analysisRead && (
-            <p className="day-detail-reading">🔎 {selectedEntry.analysisRead}</p>
-          )}
-          {selectedEntry.analysisSuggestion && (
-            <p className="day-detail-suggest">
-              🌱 {selectedEntry.analysisSuggestion}
-            </p>
-          )}
-          {selectedEntry.message && (
-            <p className="day-detail-message">{selectedEntry.message}</p>
-          )}
-          {selectedEntry.quoteText && (
-            <p className="day-detail-quote">
-              “{selectedEntry.quoteText}”
-              {selectedEntry.quoteAuthor ? (
-                <span className="saved-qauthor"> — {selectedEntry.quoteAuthor}</span>
-              ) : null}
-            </p>
-          )}
-          {selectedEntry.personaName && (
-            <p className="day-detail-sign">— {selectedEntry.personaName} 드림</p>
-          )}
-          {selectedEntry.selfNote && (
-            <p className="day-detail-self">
-              🌙 오늘의 나에게 · “{selectedEntry.selfNote}”
-            </p>
-          )}
+          {selectedEntries.map((entry, idx) => (
+            <DayEntryDetail
+              key={entry.ts ?? idx}
+              entry={entry}
+              date={selected!}
+              index={selectedEntries.length > 1 ? idx + 1 : undefined}
+            />
+          ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+function DayEntryDetail({
+  entry,
+  date,
+  index,
+}: {
+  entry: Entry;
+  date: string;
+  index?: number;
+}) {
+  const mood = moodById[entry.moodId];
+  if (!mood) return null;
+  const time = fmtTime(entry.ts);
+  return (
+    <div className="day-detail" style={{ borderColor: `${mood.color}55` }}>
+      <div className="day-detail-head">
+        <span className="day-detail-emoji">{entry.typeEmoji || mood.emoji}</span>
+        <div>
+          <p className="day-detail-date">
+            {index ? `${index}번째 기록` : date}
+            {time ? ` · ${time}` : ""}
+          </p>
+          <p className="day-detail-type">{entry.typeLabel || mood.label}</p>
+        </div>
+      </div>
+
+      {typeof entry.intensity === "number" && (
+        <p className="day-detail-line">
+          강도 · {INTENSITY_LABELS[entry.intensity]}
+        </p>
+      )}
+
+      {entry.qa && entry.qa.length > 0 && (
+        <div className="qa-list">
+          {entry.qa.map((item, i) => (
+            <div className="qa-row" key={i}>
+              <span className="qa-q">{item.q}</span>
+              <span className="qa-a">{item.a}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {entry.note && <p className="day-detail-note">✍️ {entry.note}</p>}
+      {entry.note && reflectNote(entry.note) && (
+        <p className="day-detail-reflect">💡 {reflectNote(entry.note)}</p>
+      )}
+
+      {entry.analysisRead && (
+        <p className="day-detail-reading">🔎 {entry.analysisRead}</p>
+      )}
+      {entry.analysisSuggestion && (
+        <p className="day-detail-suggest">🌱 {entry.analysisSuggestion}</p>
+      )}
+      {entry.message && <p className="day-detail-message">{entry.message}</p>}
+      {entry.quoteText && (
+        <p className="day-detail-quote">
+          “{entry.quoteText}”
+          {entry.quoteAuthor ? (
+            <span className="saved-qauthor"> — {entry.quoteAuthor}</span>
+          ) : null}
+        </p>
+      )}
+      {entry.personaName && (
+        <p className="day-detail-sign">— {entry.personaName} 드림</p>
+      )}
+      {entry.selfNote && (
+        <p className="day-detail-self">
+          🌙 오늘의 나에게 · “{entry.selfNote}”
+        </p>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 // 클라우드 동기화 (Supabase RPC). 미설정이면 전부 no-op → 로컬만 사용.
 import { supabase } from "./supabase";
-import type { JournalMap, SavedItem } from "./storage";
+import { normalizeJournal, type JournalMap, type SavedItem } from "./storage";
 
 export type CloudState = { journal: JournalMap; saved: SavedItem[] };
 
@@ -13,7 +13,7 @@ export async function pullMoodState(uid: string): Promise<CloudState | null> {
     const row = Array.isArray(data) ? data[0] : data;
     if (!row) return null;
     return {
-      journal: (row.journal as JournalMap) || {},
+      journal: normalizeJournal((row.journal as Record<string, unknown>) || {}),
       saved: (row.saved as SavedItem[]) || [],
     };
   } catch {
