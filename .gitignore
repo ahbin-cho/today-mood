@@ -29,3 +29,6 @@ next-env.d.ts
 # omc / claude
 .omc/
 .claude/
+
+# db setup
+supabase-setup.sql
