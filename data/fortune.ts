@@ -107,8 +107,9 @@ function pick<T>(arr: T[], seed: string): T {
   return arr[hashString(seed) % arr.length];
 }
 
-export function buildFortune(dateKey: string, history?: MoodHistory): Fortune {
-  const base = 60 + (hashString(dateKey + "|score") % 34); // 60~93 (개인화 여지)
+export function buildFortune(dateKey: string, history?: MoodHistory, uid?: string): Fortune {
+  const seed = uid ? `${dateKey}:${uid}` : dateKey;
+  const base = 60 + (hashString(seed + "|score") % 34); // 60~93 (개인화 여지)
   let score = base;
   let flow = "오늘부터 마음을 기록하면, 내일의 운세가 당신에게 더 맞춰져요.";
   let personalized = false;
@@ -134,13 +135,13 @@ export function buildFortune(dateKey: string, history?: MoodHistory): Fortune {
   }
 
   return {
-    line: pick(lines, dateKey + "|line"),
+    line: pick(lines, seed + "|line"),
     score,
-    color: pick(colors, dateKey + "|color"),
-    time: pick(times, dateKey + "|time"),
-    item: pick(items, dateKey + "|item"),
-    tip: pick(tips, dateKey + "|tip"),
-    keyword: pick(keywords, dateKey + "|kw"),
+    color: pick(colors, seed + "|color"),
+    time: pick(times, seed + "|time"),
+    item: pick(items, seed + "|item"),
+    tip: pick(tips, seed + "|tip"),
+    keyword: pick(keywords, seed + "|kw"),
     flow,
     personalized,
   };

@@ -40,7 +40,7 @@ import MoodCalendar from "@/components/MoodCalendar";
 const DEFAULT_BG: [string, string] = ["#FBF6EE", "#F3E9DB"];
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
 const INTENSITY_LABELS = ["", "아주 살짝", "살짝", "보통", "꽤", "아주 많이"];
-const PERSONA_KEY = "today-mood:persona:v1";
+// persona is now randomly assigned when starting a check-in
 
 type Tab = "today" | "calendar" | "saved";
 type Stage = "home" | "breathe" | "intensity" | "questions" | "note" | "result";
@@ -97,7 +97,7 @@ export default function MoodApp() {
   const [note, setNote] = useState("");
   const [rc, setRc] = useState<ResultContent | null>(null);
 
-  const [personaId, setPersonaId] = useState<string>("seoa");
+  const [personaId, setPersonaId] = useState<string | null>(null);
   const [selfNote, setSelfNote] = useState("");
   const [selfSaved, setSelfSaved] = useState(false);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -115,15 +115,7 @@ export default function MoodApp() {
     const localS = loadSaved();
     setJournal(localJ);
     setSaved(localS);
-    const stored =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem(PERSONA_KEY)
-        : null;
-    setPersonaId(
-      stored && personaById[stored]
-        ? stored
-        : seededPick(personas, dateKey(now)).id
-    );
+    // persona is assigned randomly when starting a check-in
 
     // 클라우드 동기화 (Supabase 설정 시에만 동작)
     const uid = getDeviceId();
@@ -149,7 +141,7 @@ export default function MoodApp() {
   const dateText = today ? labelOf(today) : "";
   const todayKey = today ? dateKey(today) : "";
   const streak = today ? calcStreak(journal, today) : 0;
-  const persona: Persona = personaById[personaId] || personas[0];
+  const persona: Persona = (personaId && personaById[personaId]) || personas[0];
 
   const daily = useMemo<Quote | null>(
     () => (todayKey ? seededPick(dailyOneLiners, todayKey) : null),
@@ -194,7 +186,7 @@ export default function MoodApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [journal, today]);
   const fortune = useMemo<Fortune | null>(
-    () => (todayKey ? buildFortune(todayKey, history) : null),
+    () => (todayKey ? buildFortune(todayKey, history, uidRef.current || undefined) : null),
     [todayKey, history]
   );
 
@@ -220,9 +212,6 @@ export default function MoodApp() {
 
   const choosePersona = (id: string) => {
     setPersonaId(id);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PERSONA_KEY, id);
-    }
   };
 
   const makeContent = (
@@ -277,6 +266,7 @@ export default function MoodApp() {
     const qs = buildMoodQuestions(m.id, 8);
     setMood(m);
     setIntensity(3);
+    setPersonaId(pickRandom(personas).id);
     setSessionQuestions(qs);
     setPicked(new Array(qs.length).fill(null));
     setQIndex(0);
@@ -488,23 +478,6 @@ export default function MoodApp() {
                   </p>
                 </div>
               )}
-
-              <p className="section-label">오늘의 마음을 누구와 살펴볼까요?</p>
-              <div className="persona-row">
-                {personas.map((p) => (
-                  <button
-                    key={p.id}
-                    className={`persona-chip${p.id === personaId ? " on" : ""}`}
-                    onClick={() => choosePersona(p.id)}
-                  >
-                    <img className="persona-photo" src={p.avatar} alt="" />
-                    <span className="persona-copy">
-                      <span className="persona-name">{p.name}</span>
-                      <span className="persona-tag">{p.tagline}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
 
               <p className="section-label">지금 마음과 가장 가까운 문장을 골라보세요</p>
               <div className="mood-grid">
