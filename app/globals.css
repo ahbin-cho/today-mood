@@ -1035,6 +1035,109 @@ body {
 .ps-btn:hover { opacity: 0.9; }
 .ps-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+.share-card-wrap {
+  width: 100%;
+  display: grid;
+  gap: 14px;
+}
+
+.share-card-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  min-height: 520px;
+  border: 1px solid rgba(175, 152, 123, 0.34);
+  background: linear-gradient(180deg, #f4eadc 0%, #efe3d2 100%);
+  box-shadow: 0 22px 54px rgba(81, 61, 37, 0.12);
+}
+
+.share-card-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.share-card-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(249, 243, 236, 0.08) 0%, rgba(249, 243, 236, 0.82) 48%, rgba(249, 243, 236, 0.96) 100%);
+}
+
+.share-card-sheet {
+  position: relative;
+  z-index: 1;
+  margin: 220px 26px 26px;
+  padding: 26px 24px 22px;
+  border-radius: 24px;
+  background: rgba(251, 248, 242, 0.9);
+  border: 1px solid rgba(183, 163, 138, 0.38);
+  box-shadow: 0 16px 36px rgba(81, 61, 37, 0.08);
+  text-align: center;
+}
+
+.share-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #9b8875;
+  margin-bottom: 10px;
+}
+
+.share-card-emoji {
+  font-size: 38px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.share-card-caption {
+  font-family: var(--display) !important;
+  font-size: 24px;
+  line-height: 1.45;
+  color: #332c26;
+  margin-bottom: 14px;
+  word-break: keep-all;
+}
+
+.share-card-message {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #5d5146;
+  word-break: keep-all;
+}
+
+.share-card-quote {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(183, 163, 138, 0.42);
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.share-card-quote p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #4b4239;
+  word-break: keep-all;
+}
+
+.share-card-quote span {
+  display: block;
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #7f6e5d;
+}
+
+.share-card-date {
+  margin-top: 18px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #685a4d;
+}
+
 /* 캘린더 상세 추가 */
 .day-detail-sign {
   margin-top: 10px;
@@ -1502,6 +1605,7 @@ body {
   --serif: "MaruBuri", "Gowun Batang", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
   --sans: "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
   --hand: "Nanum Pen Script", "Gowun Batang", cursive;
+  --soft: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   --ink: #3b332a;
   --ink-soft: #8c7d6b;
   --line: #e6d9c4;
@@ -1535,6 +1639,12 @@ body::after {
 /* ---------- 글씨체 배정 ---------- */
 .title,
 .section-label,
+.daily-label {
+  font-family: var(--serif) !important;
+  letter-spacing: -0.005em !important;
+}
+.title { font-weight: 700 !important; }
+
 .step-title,
 .mood-name,
 .persona-name,
@@ -1546,11 +1656,47 @@ body::after {
 .breathe-text,
 .cal-title,
 .day-detail-type,
-.daily-label {
-  font-family: var(--serif) !important;
-  letter-spacing: -0.005em !important;
+.saved-message,
+.share-card-caption {
+  font-family: var(--soft) !important;
+  letter-spacing: -0.01em !important;
 }
-.title { font-weight: 700 !important; }
+
+.mood-caption,
+.subtitle,
+.letter-line,
+.report-summary,
+.reading-read,
+.reading-suggest-text,
+.support-note,
+.quote-author,
+.daily-author,
+.free-input,
+.ps-saved,
+.saved-quote,
+.saved-date,
+.footer,
+.day-detail-line,
+.day-detail-note,
+.day-detail-message,
+.day-detail-quote {
+  font-family: var(--soft) !important;
+}
+
+.persona-name,
+.mood-name,
+.step-title,
+.letter-open,
+.letter-body,
+.report-type {
+  font-weight: 700 !important;
+}
+
+.quote-text,
+.saved-message {
+  font-weight: 600 !important;
+}
+
 .daily-text,
 .daily-author,
 .letter-sign {
@@ -1659,7 +1805,7 @@ body::after {
 }
 .letter-open { font-size: 20px !important; font-weight: 700 !important; color: #34291d !important; }
 .letter-body { font-size: 20px !important; font-weight: 700 !important; }
-.letter-line { font-family: var(--serif) !important; }
+.letter-line { font-family: var(--soft) !important; }
 .quote-text { font-size: 16px !important; font-style: normal !important; }
 
 /* ---------- 진단 리포트 ---------- */
@@ -1684,7 +1830,7 @@ body::after {
 
 /* ---------- 캘린더/담은 문장 ---------- */
 .cal-title, .day-detail-type { color: #33291f !important; }
-.saved-message { font-family: var(--serif) !important; }
+.saved-message { font-family: var(--soft) !important; }
 
 /* =====================================================================
    체크인 단계 화면 — 상담답게 다듬기 (좁고 밀도 있게 + 상담사 헤더)
@@ -2011,6 +2157,26 @@ body::after {
   font-size: 13px;
   line-height: 1.6;
   color: #4a3d2f;
+  background: rgba(176, 137, 95, 0.1);
+  border-radius: 10px;
+  padding: 9px 12px;
+  word-break: keep-all;
+}
+
+/* 진단 결과 박스 위아래 여백 맞춤 */
+.report {
+  padding: 20px 22px !important;
+  border-radius: 16px !important;
+  margin-bottom: 0 !important;
+}
+
+/* 운세: 내 기록 반영 흐름 한 줄 */
+.fortune-flow {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #6d5a3e;
   background: rgba(176, 137, 95, 0.1);
   border-radius: 10px;
   padding: 9px 12px;

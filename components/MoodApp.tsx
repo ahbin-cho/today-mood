@@ -15,6 +15,7 @@ import {
   type Analysis,
 } from "@/data/checkin";
 import { personas, personaById, type Persona } from "@/data/personas";
+import { buildFortune, type Fortune, type MoodHistory } from "@/data/fortune";
 import { seededPick, pickRandom } from "@/lib/pick";
 import {
   dateKey,
@@ -55,6 +56,29 @@ type ResultContent = {
 
 function labelOf(d: Date): string {
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()} (${WEEK[d.getDay()]})`;
+}
+
+function shareArtworkForMood(moodId: string): string {
+  switch (moodId) {
+    case "happy":
+    case "flutter":
+      return "/share-art/good-day.png";
+    case "calm":
+      return "/share-art/calm-day.png";
+    case "down":
+    case "sad":
+      return "/share-art/down-day.png";
+    case "anxious":
+    case "lonely":
+      return "/share-art/anxious-day.png";
+    case "burnout":
+    case "empty":
+      return "/share-art/rest-day.png";
+    case "angry":
+      return "/share-art/anger-day.png";
+    default:
+      return "/share-art/calm-day.png";
+  }
 }
 
 export default function MoodApp() {
@@ -131,6 +155,49 @@ export default function MoodApp() {
     () => (todayKey ? seededPick(dailyOneLiners, todayKey) : null),
     [todayKey]
   );
+
+  // 최근 기록으로 운세 개인화용 요약
+  const TYPE_WEIGHT: Record<string, number> = {
+    "한결 가벼운 하루": 4,
+    "잔잔히 흘러가는 하루": 3,
+    "조금 버거운 하루": 2,
+    "돌봄이 필요한 하루": 1,
+  };
+  const MOOD_POS: Record<string, number> = {
+    happy: 4, flutter: 4, calm: 3, down: 2, anxious: 2,
+    empty: 2, burnout: 1.5, lonely: 2, angry: 2, sad: 1.5,
+  };
+  const history = useMemo<MoodHistory | undefined>(() => {
+    if (!today) return undefined;
+    let recent = 0;
+    let sum = 0;
+    let cnt = 0;
+    for (let d = 0; d < 7; d++) {
+      const dd = new Date(today);
+      dd.setDate(today.getDate() - d);
+      const e = journal[dateKey(dd)];
+      if (e) {
+        recent++;
+        const w =
+          (e.typeLabel ? TYPE_WEIGHT[e.typeLabel] : undefined) ??
+          MOOD_POS[e.moodId] ??
+          2.5;
+        sum += w;
+        cnt++;
+      }
+    }
+    return {
+      streak: calcStreak(journal, today),
+      recentCount: recent,
+      trend: cnt ? sum / cnt : NaN,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [journal, today]);
+  const fortune = useMemo<Fortune | null>(
+    () => (todayKey ? buildFortune(todayKey, history) : null),
+    [todayKey, history]
+  );
+
   const bg = mood && stage !== "home" ? mood.bg : DEFAULT_BG;
 
   // ---- 답변 파생값 ----
@@ -316,6 +383,7 @@ export default function MoodApp() {
   const shareData: ShareCardData | null =
     mood && rc
       ? {
+          imageSrc: shareArtworkForMood(mood.id),
           emoji: mood.emoji,
           caption: acknowledgment(mood.id, intensity),
           message: rc.message,
@@ -375,6 +443,61 @@ export default function MoodApp() {
                   <p className="daily-text dim">오늘의 한마디를 불러오는 중…</p>
                 )}
               </div>
+
+              {fortune && (
+                <div className="fortune-card">
+                  <p className="fortune-head">🔮 오늘의 마음 운세</p>
+                  <p className="fortune-line">“{fortune.line}”</p>
+
+                  <div className="fortune-gauge">
+                    <div className="fortune-gauge-top">
+                      <span>오늘의 마음 기운</span>
+                      <span className="fortune-score">{fortune.score}점</span>
+                    </div>
+                    <div className="fortune-bar">
+                      <span
+                        className="fortune-bar-fill"
+                        style={{ width: `${fortune.score}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <p className="fortune-flow">
+                    {fortune.personalized ? "🌱 " : "✍️ "}
+                    {fortune.flow}
+                  </p>
+
+                  <div className="fortune-grid">
+                    <div className="fortune-item">
+                      <span className="fortune-key">행운의 색</span>
+                      <span className="fortune-val">
+                        <span
+                          className="fortune-swatch"
+                          style={{ background: fortune.color.hex }}
+                        />
+                        {fortune.color.name}
+                      </span>
+                    </div>
+                    <div className="fortune-item">
+                      <span className="fortune-key">행운의 시간</span>
+                      <span className="fortune-val">{fortune.time}</span>
+                    </div>
+                    <div className="fortune-item">
+                      <span className="fortune-key">오늘의 아이템</span>
+                      <span className="fortune-val">{fortune.item}</span>
+                    </div>
+                    <div className="fortune-item">
+                      <span className="fortune-key">오늘의 키워드</span>
+                      <span className="fortune-val">#{fortune.keyword}</span>
+                    </div>
+                  </div>
+
+                  <p className="fortune-tip">🍀 오늘의 작은 처방 · {fortune.tip}</p>
+                  <p className="fortune-note">
+                    * 재미로 보는 운세예요. 내 기록이 쌓일수록 기운 점수가 더 맞춰져요.
+                  </p>
+                </div>
+              )}
 
               <p className="section-label">오늘의 마음을 누구와 살펴볼까요?</p>
               <div className="persona-row">

@@ -7,12 +7,21 @@ export type LuckyColor = { name: string; hex: string };
 
 export type Fortune = {
   line: string; // 한 줄 운세
-  score: number; // 마음 기운 지수 (60~99)
+  score: number; // 마음 기운 지수 (55~99)
   color: LuckyColor; // 행운의 색
   time: string; // 행운의 시간
   item: string; // 오늘의 아이템
   tip: string; // 오늘의 작은 처방
   keyword: string; // 오늘의 키워드
+  flow: string; // 내 기록이 반영된 기운 흐름 한 줄
+  personalized: boolean; // 기록이 반영됐는지
+};
+
+// 내 최근 체크인 기록 요약 (기운 점수 개인화용)
+export type MoodHistory = {
+  streak: number; // 연속 기록 일수
+  recentCount: number; // 최근 7일 기록 수
+  trend: number; // 최근 마음 무게 평균(1~4). 기록 없으면 NaN
 };
 
 const lines = [
@@ -98,14 +107,41 @@ function pick<T>(arr: T[], seed: string): T {
   return arr[hashString(seed) % arr.length];
 }
 
-export function buildFortune(dateKey: string): Fortune {
+export function buildFortune(dateKey: string, history?: MoodHistory): Fortune {
+  const base = 60 + (hashString(dateKey + "|score") % 34); // 60~93 (개인화 여지)
+  let score = base;
+  let flow = "오늘부터 마음을 기록하면, 내일의 운세가 당신에게 더 맞춰져요.";
+  let personalized = false;
+
+  if (history && history.recentCount > 0) {
+    personalized = true;
+    // 꾸준함 보너스 + 최근 마음 흐름 반영
+    score += Math.min(history.streak, 5) * 2;
+    if (!Number.isNaN(history.trend)) {
+      score += Math.round((history.trend - 2.5) * 5);
+    }
+    score = Math.max(55, Math.min(99, score));
+
+    if (history.streak >= 3) {
+      flow = `마음을 ${history.streak}일째 돌보고 있어요. 그 꾸준함이 오늘의 기운을 밀어올려요.`;
+    } else if (!Number.isNaN(history.trend) && history.trend <= 2) {
+      flow = "요즘 마음이 조금 무거웠죠. 오늘의 기운은 천천히 차오르는 중이에요.";
+    } else if (!Number.isNaN(history.trend) && history.trend >= 3.2) {
+      flow = "최근의 좋은 흐름이 오늘의 기운에도 이어지고 있어요.";
+    } else {
+      flow = "최근 남긴 기록들이 오늘의 기운에 은은하게 반영됐어요.";
+    }
+  }
+
   return {
     line: pick(lines, dateKey + "|line"),
-    score: 60 + (hashString(dateKey + "|score") % 40), // 60~99
+    score,
     color: pick(colors, dateKey + "|color"),
     time: pick(times, dateKey + "|time"),
     item: pick(items, dateKey + "|item"),
     tip: pick(tips, dateKey + "|tip"),
     keyword: pick(keywords, dateKey + "|kw"),
+    flow,
+    personalized,
   };
 }

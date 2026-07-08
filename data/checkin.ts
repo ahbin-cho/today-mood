@@ -10,624 +10,92 @@ export type MoodQuestion = {
   choices: MoodChoice[];
 };
 
-// 기분(moodId)별 맞춤 질문 풀 (기분당 5개). 시작할 때마다 이 중 3개를 뽑아요.
-// 톤: 기쁨·설렘·짜증은 위트 있게 / 우울·불안·외로움·슬픔·번아웃은 더 깊고 다정하게.
-export const moodQuestions: Record<string, MoodQuestion[]> = {
+const structuredMoodQuestions: Record<string, MoodQuestion[]> = {
   happy: [
-    {
-      emoji: "✨",
-      title: "오늘 기분을 좋게 만든 건 무엇인가요?",
-      short: "계기",
-      choices: [
-        { label: "특별한 일이 있었어요", value: 4 },
-        { label: "소소한 순간들이 모였어요", value: 4 },
-        { label: "딱히 이유는 없어요", value: 3 },
-        { label: "그냥 오늘의 내가 좀 멋졌어요", value: 4 },
-      ],
-    },
-    {
-      emoji: "🤝",
-      title: "이 기분을 지금 어떻게 하고 싶나요?",
-      short: "바람",
-      choices: [
-        { label: "마음껏 즐기고 싶어요", value: 4 },
-        { label: "누군가와 나누고 싶어요", value: 4 },
-        { label: "조용히 간직하고 싶어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🕰️",
-      title: "이 좋은 기분, 얼마나 갈 것 같나요?",
-      short: "지속",
-      choices: [
-        { label: "한동안 이어질 것 같아요", value: 4 },
-        { label: "오늘 하루는 갈 것 같아요", value: 3 },
-        { label: "금방 사라질까 살짝 걱정돼요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🏷️",
-      title: "오늘 이 기분에 이름을 붙인다면?",
-      short: "이름",
-      choices: [
-        { label: "'럭키 데이'", value: 4 },
-        { label: "'소확행 모음집'", value: 4 },
-        { label: "'이유는 몰라도 개운'", value: 3 },
-        { label: "'텐션 최고조'", value: 4 },
-      ],
-    },
-    {
-      emoji: "📸",
-      title: "오늘을 한 장면으로 남긴다면?",
-      short: "장면",
-      choices: [
-        { label: "활짝 웃는 셀카", value: 4 },
-        { label: "좋아하는 사람과 한 컷", value: 4 },
-        { label: "맛있는 거 인증샷", value: 4 },
-        { label: "그냥 예뻤던 하늘", value: 3 },
-      ],
-    },
+    { emoji: "☀️", title: "오늘 기분이 좋아진 데에는 비교적 분명한 이유가 있나요?", short: "이유", choices: [{ label: "분명한 계기가 있었어요", value: 4 }, { label: "소소한 좋은 일이 겹쳤어요", value: 4 }, { label: "이유는 뚜렷하지 않지만 안정적이에요", value: 3 }] },
+    { emoji: "🫶", title: "이 좋은 기분이 지금 나에게 어떤 도움을 주고 있나요?", short: "도움", choices: [{ label: "에너지와 의욕이 올라와요", value: 4 }, { label: "사람들과 편하게 연결돼요", value: 4 }, { label: "마음이 한결 안정돼요", value: 3 }] },
+    { emoji: "🧭", title: "지금의 좋은 상태는 얼마나 안정적으로 느껴지나요?", short: "안정감", choices: [{ label: "꽤 안정적으로 유지돼요", value: 4 }, { label: "오늘 하루는 이어질 것 같아요", value: 3 }, { label: "좋지만 금방 사라질까 걱정돼요", value: 2 }] },
+    { emoji: "📝", title: "이 기분을 어떻게 남기고 싶나요?", short: "기록", choices: [{ label: "기록해두고 싶어요", value: 4 }, { label: "누군가와 나누고 싶어요", value: 4 }, { label: "그냥 조용히 누리고 싶어요", value: 3 }] },
+    { emoji: "🌿", title: "지금의 상태에서 스스로에게 가장 해주고 싶은 말은 무엇인가요?", short: "자기말", choices: [{ label: "\"잘 해내고 있어\"", value: 4 }, { label: "\"이 감정을 충분히 누려도 돼\"", value: 4 }, { label: "\"무리하지 말고 이 리듬을 지켜보자\"", value: 3 }] },
+    { emoji: "🔎", title: "이 좋은 감정이 이후에도 유지되려면 무엇이 필요할까요?", short: "유지", choices: [{ label: "지금의 리듬을 해치지 않는 것", value: 4 }, { label: "조금 더 나를 챙기는 것", value: 4 }, { label: "기록해두고 다시 꺼내보는 것", value: 3 }] },
   ],
   flutter: [
-    {
-      emoji: "💓",
-      title: "무엇에 설레고 있나요?",
-      short: "대상",
-      choices: [
-        { label: "곧 있을 일이나 약속", value: 4 },
-        { label: "좋아하는 사람", value: 4 },
-        { label: "새로운 시작", value: 4 },
-        { label: "이유 없이 그냥", value: 3 },
-      ],
-    },
-    {
-      emoji: "🌸",
-      title: "그 설렘, 티가 나나요?",
-      short: "표현",
-      choices: [
-        { label: "이미 다 티 나요", value: 4 },
-        { label: "속으로만 간직해요", value: 3 },
-        { label: "들킬까 조마조마해요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🌡️",
-      title: "이 두근거림은 어떤 온도인가요?",
-      short: "온도",
-      choices: [
-        { label: "기분 좋은 떨림이에요", value: 4 },
-        { label: "살짝 긴장도 돼요", value: 3 },
-        { label: "설렘 반 불안 반이에요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🎢",
-      title: "지금 심장 박동을 그래프로 그리면?",
-      short: "박동",
-      choices: [
-        { label: "쿵쾅쿵쾅 급상승", value: 4 },
-        { label: "잔잔한 물결", value: 3 },
-        { label: "롤러코스터 급이에요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🔮",
-      title: "이 설렘의 결말을 예상한다면?",
-      short: "예감",
-      choices: [
-        { label: "분명 좋을 거예요", value: 4 },
-        { label: "모르니까 더 설레요", value: 4 },
-        { label: "기대 말자 싶다가도 두근", value: 3 },
-      ],
-    },
+    { emoji: "💓", title: "지금의 설렘에는 기대와 긴장 중 어떤 감정이 더 크게 섞여 있나요?", short: "감정결", choices: [{ label: "기대가 더 커요", value: 4 }, { label: "기대와 긴장이 비슷해요", value: 3 }, { label: "긴장도 꽤 커요", value: 2 }] },
+    { emoji: "🎯", title: "이 설렘의 대상은 비교적 분명한 편인가요?", short: "대상", choices: [{ label: "무엇 때문인지 분명해요", value: 4 }, { label: "대강은 알겠어요", value: 3 }, { label: "명확하지 않지만 들떠 있어요", value: 3 }] },
+    { emoji: "🫁", title: "몸의 반응으로 보면 이 설렘은 편안한 편인가요?", short: "신체", choices: [{ label: "편안하고 기분 좋은 떨림이에요", value: 4 }, { label: "약간 긴장되지만 괜찮아요", value: 3 }, { label: "들뜨지만 불안도 함께 있어요", value: 2 }] },
+    { emoji: "🧠", title: "이 감정이 생각을 어떻게 바꾸고 있나요?", short: "생각", choices: [{ label: "앞일을 긍정적으로 보게 돼요", value: 4 }, { label: "자꾸 그 일만 떠올라요", value: 3 }, { label: "기대와 걱정이 번갈아 와요", value: 2 }] },
+    { emoji: "🗣️", title: "이 마음을 밖으로 표현하고 싶은 편인가요?", short: "표현", choices: [{ label: "표현하고 싶어요", value: 4 }, { label: "조용히 간직하고 싶어요", value: 3 }, { label: "표현하면 깨질까 조심스러워요", value: 2 }] },
+    { emoji: "📍", title: "이 설렘이 지금 생활에 주는 영향은 어떤가요?", short: "영향", choices: [{ label: "활력을 줘요", value: 4 }, { label: "집중이 조금 흔들려요", value: 3 }, { label: "좋지만 피로도 함께 와요", value: 2 }] },
   ],
   calm: [
-    {
-      emoji: "🍃",
-      title: "이 잔잔함은 어떤 느낌인가요?",
-      short: "결",
-      choices: [
-        { label: "편안한 고요함이에요", value: 4 },
-        { label: "그냥 무난해요", value: 3 },
-        { label: "조금 심심해요", value: 2 },
-        { label: "살짝 공허해요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🌿",
-      title: "오늘 나를 위한 여유가 있었나요?",
-      short: "여유",
-      choices: [
-        { label: "충분히 있었어요", value: 4 },
-        { label: "조금 있었어요", value: 3 },
-        { label: "거의 없었어요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🤍",
-      title: "지금 무언가 바라는 게 있나요?",
-      short: "바람",
-      choices: [
-        { label: "이대로가 좋아요", value: 4 },
-        { label: "작은 변화가 있으면 해요", value: 3 },
-        { label: "잘 모르겠어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "☕",
-      title: "오늘을 음료 한 잔으로 표현하면?",
-      short: "한잔",
-      choices: [
-        { label: "따뜻한 차 한 잔", value: 4 },
-        { label: "무난한 아메리카노", value: 3 },
-        { label: "미지근한 물 한 잔", value: 3 },
-        { label: "김빠진 탄산 같아요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🎬",
-      title: "오늘이 영화라면 장르는?",
-      short: "장르",
-      choices: [
-        { label: "힐링 다큐", value: 4 },
-        { label: "잔잔한 일상물", value: 3 },
-        { label: "조금 지루한 중간 부분", value: 2 },
-      ],
-    },
+    { emoji: "🍃", title: "지금의 잔잔함은 편안함에 가깝나요, 무감함에 가깝나요?", short: "결", choices: [{ label: "편안하고 안정적이에요", value: 4 }, { label: "그냥 무난한 상태예요", value: 3 }, { label: "조금 무덤덤한 편이에요", value: 2 }] },
+    { emoji: "🫖", title: "오늘 하루 속도는 나에게 무리가 없는 편이었나요?", short: "속도", choices: [{ label: "무리 없는 리듬이었어요", value: 4 }, { label: "조금 바빴지만 괜찮았어요", value: 3 }, { label: "겉으론 잔잔하지만 속은 지쳤어요", value: 2 }] },
+    { emoji: "🧭", title: "지금 상태에서 가장 잘 유지되고 있는 부분은 무엇인가요?", short: "유지", choices: [{ label: "감정 기복이 크지 않아요", value: 4 }, { label: "생각이 비교적 정돈돼 있어요", value: 3 }, { label: "그럭저럭 버티는 정도예요", value: 3 }] },
+    { emoji: "🤍", title: "이 평온함을 해치는 요소가 지금 있나요?", short: "방해", choices: [{ label: "거의 없어요", value: 4 }, { label: "작은 걱정 하나쯤 있어요", value: 3 }, { label: "겉만 괜찮고 안은 조금 복잡해요", value: 2 }] },
+    { emoji: "🌱", title: "오늘 나를 위해 챙긴 작은 여유가 있었나요?", short: "여유", choices: [{ label: "분명히 있었어요", value: 4 }, { label: "짧게라도 있었어요", value: 3 }, { label: "거의 없었어요", value: 2 }] },
+    { emoji: "📌", title: "지금 상태에서 스스로에게 가장 필요한 태도는 무엇일까요?", short: "태도", choices: [{ label: "이 리듬을 유지하는 것", value: 4 }, { label: "조금 더 나를 챙기는 것", value: 3 }, { label: "괜찮은 척하지 않는 것", value: 2 }] },
   ],
   down: [
-    {
-      emoji: "🕰️",
-      title: "언제부터 마음이 가라앉았나요?",
-      short: "시작",
-      choices: [
-        { label: "아침부터 쭉이요", value: 2 },
-        { label: "어떤 일 이후로요", value: 2 },
-        { label: "이유 없이 문득요", value: 2 },
-        { label: "며칠째 이어져요", value: 1 },
-      ],
-    },
-    {
-      emoji: "🫧",
-      title: "몸도 무겁게 느껴지나요?",
-      short: "몸",
-      choices: [
-        { label: "많이 무거워요", value: 1 },
-        { label: "조금 그래요", value: 2 },
-        { label: "몸은 괜찮아요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🧡",
-      title: "지금 나에게 필요한 건 무엇일까요?",
-      short: "필요",
-      choices: [
-        { label: "혼자만의 시간", value: 3 },
-        { label: "누군가의 위로", value: 3 },
-        { label: "푹 쉬는 것", value: 3 },
-        { label: "잘 모르겠어요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🌧️",
-      title: "이 가라앉은 마음을 날씨로 말하면?",
-      short: "날씨",
-      choices: [
-        { label: "그칠 줄 모르는 장대비", value: 1 },
-        { label: "부슬부슬 이슬비", value: 2 },
-        { label: "흐리지만 곧 갤 것 같은", value: 3 },
-      ],
-    },
-    {
-      emoji: "🪶",
-      title: "지금 스스로에게 뭐라고 해주고 싶나요?",
-      short: "자기말",
-      choices: [
-        { label: "\"그럴 수 있어, 괜찮아\"", value: 3 },
-        { label: "\"오늘은 좀 쉬어도 돼\"", value: 3 },
-        { label: "\"왜 이러지…\" 싶어요", value: 1 },
-      ],
-    },
+    { emoji: "🌧️", title: "가라앉은 기분이 오늘 하루 전반에 얼마나 영향을 주고 있나요?", short: "영향", choices: [{ label: "하루 전체를 무겁게 만들어요", value: 1 }, { label: "중간중간 크게 느껴져요", value: 2 }, { label: "있지만 견딜 수는 있어요", value: 3 }] },
+    { emoji: "🫧", title: "이 기분은 생각보다 몸에서 먼저 느껴지나요?", short: "몸반응", choices: [{ label: "몸도 많이 무거워요", value: 1 }, { label: "몸과 마음이 둘 다 가라앉아요", value: 2 }, { label: "마음 쪽이 더 커요", value: 3 }] },
+    { emoji: "🧠", title: "가장 자주 드는 생각은 어떤 쪽에 가깝나요?", short: "생각", choices: [{ label: "의욕이 잘 안 생겨요", value: 1 }, { label: "왜 이러는지 모르겠어요", value: 2 }, { label: "쉬면 나아질 것 같아요", value: 3 }] },
+    { emoji: "🫶", title: "지금 가장 필요한 도움은 무엇에 가깝나요?", short: "필요", choices: [{ label: "충분한 휴식", value: 3 }, { label: "누군가의 이해와 공감", value: 3 }, { label: "지금은 아직 잘 모르겠어요", value: 2 }] },
+    { emoji: "🕰️", title: "이 상태가 얼마나 이어지고 있다고 느끼나요?", short: "지속", choices: [{ label: "며칠 이상 이어지는 느낌이에요", value: 1 }, { label: "오늘 유난히 그래요", value: 2 }, { label: "파도처럼 왔다 갔다 해요", value: 2 }] },
+    { emoji: "🪶", title: "스스로에게 지금 해줄 수 있는 가장 현실적인 말은 무엇인가요?", short: "자기말", choices: [{ label: "\"오늘은 천천히 가도 돼\"", value: 3 }, { label: "\"왜 이런지 몰라도 지금은 버거울 수 있어\"", value: 2 }, { label: "\"일단 하나만 해보자\"", value: 3 }] },
   ],
   anxious: [
-    {
-      emoji: "🎯",
-      title: "무엇이 가장 마음에 걸리나요?",
-      short: "걱정",
-      choices: [
-        { label: "앞으로 일어날 일", value: 2 },
-        { label: "해야 할 일들", value: 2 },
-        { label: "관계 문제", value: 2 },
-        { label: "콕 집기 어려워요", value: 1 },
-      ],
-    },
-    {
-      emoji: "🎚️",
-      title: "그 걱정, 지금 손쓸 수 있는 일인가요?",
-      short: "통제",
-      choices: [
-        { label: "사실 대비는 돼 있어요", value: 4 },
-        { label: "조금은 할 수 있어요", value: 3 },
-        { label: "지금은 어쩔 수 없어요", value: 2 },
-      ],
-    },
-    {
-      emoji: "😮‍💨",
-      title: "몸에도 긴장이 느껴지나요?",
-      short: "긴장",
-      choices: [
-        { label: "잔뜩 굳어 있어요", value: 1 },
-        { label: "조금 그래요", value: 2 },
-        { label: "몸은 괜찮아요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🔁",
-      title: "그 생각이 얼마나 맴도나요?",
-      short: "반추",
-      choices: [
-        { label: "쉬지 않고 계속 맴돌아요", value: 1 },
-        { label: "가끔 떠올라요", value: 2 },
-        { label: "잊고 있다가도 문득", value: 2 },
-      ],
-    },
-    {
-      emoji: "🌍",
-      title: "이 걱정, 1년 뒤에도 지금만큼 클까요?",
-      short: "거리두기",
-      choices: [
-        { label: "그때도 클 것 같아요", value: 2 },
-        { label: "그땐 작아져 있을 듯", value: 3 },
-        { label: "사실 잘 모르겠어요", value: 2 },
-      ],
-    },
+    { emoji: "🎯", title: "지금 불안을 크게 만드는 대상이 비교적 분명한가요?", short: "대상", choices: [{ label: "분명한 걱정거리가 있어요", value: 2 }, { label: "여러 일이 겹쳐 있어요", value: 2 }, { label: "콕 집기 어려운 불안이에요", value: 1 }] },
+    { emoji: "🫁", title: "불안이 올라올 때 몸에서는 어떤 반응이 먼저 느껴지나요?", short: "신체", choices: [{ label: "숨이 가빠지거나 얕아져요", value: 1 }, { label: "몸이 굳고 긴장돼요", value: 2 }, { label: "생각 쪽이 더 분주해져요", value: 2 }] },
+    { emoji: "🔁", title: "같은 생각이 반복되는 정도는 어떤가요?", short: "반복", choices: [{ label: "계속 맴돌아요", value: 1 }, { label: "수시로 떠올라요", value: 2 }, { label: "떠올라도 어느 정도 멈출 수 있어요", value: 3 }] },
+    { emoji: "🧭", title: "그 걱정 중 지금 바로 다룰 수 있는 부분이 있나요?", short: "통제", choices: [{ label: "거의 없어서 더 막막해요", value: 1 }, { label: "조금은 손댈 수 있어요", value: 3 }, { label: "생각보다 준비된 것도 있어요", value: 4 }] },
+    { emoji: "📉", title: "불안이 생활 리듬을 얼마나 흔들고 있나요?", short: "생활영향", choices: [{ label: "수면이나 집중까지 많이 흔들려요", value: 1 }, { label: "집중이 자주 깨져요", value: 2 }, { label: "불안하지만 일상은 유지돼요", value: 3 }] },
+    { emoji: "🤲", title: "지금 붙잡을 수 있는 가장 확실한 것은 무엇에 가깝나요?", short: "지금여기", choices: [{ label: "아직 잘 안 보여요", value: 1 }, { label: "하나쯤 떠올릴 수 있어요", value: 3 }, { label: "내가 할 수 있는 일이 분명히 있어요", value: 4 }] },
   ],
   empty: [
-    {
-      emoji: "🛋️",
-      title: "지금 몸이 원하는 건 무엇인가요?",
-      short: "욕구",
-      choices: [
-        { label: "그냥 눕고 싶어요", value: 2 },
-        { label: "아무것도 안 하기", value: 2 },
-        { label: "좋아하는 것 딱 하나", value: 3 },
-        { label: "잘 모르겠어요", value: 2 },
-      ],
-    },
-    {
-      emoji: "📅",
-      title: "이 무기력함, 얼마나 됐나요?",
-      short: "기간",
-      choices: [
-        { label: "오늘만 그래요", value: 3 },
-        { label: "며칠째예요", value: 2 },
-        { label: "꽤 오래됐어요", value: 1 },
-      ],
-    },
-    {
-      emoji: "🫶",
-      title: "혹시 스스로를 몰아세우고 있진 않나요?",
-      short: "자책",
-      choices: [
-        { label: "자꾸 나를 탓하게 돼요", value: 1 },
-        { label: "조금 그래요", value: 2 },
-        { label: "그냥 두고 있어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🔋",
-      title: "지금 방전 정도를 %로 말하면?",
-      short: "배터리",
-      choices: [
-        { label: "1% 겨우 켜져 있어요", value: 1 },
-        { label: "한 20%쯤", value: 2 },
-        { label: "반쯤은 남았어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🐌",
-      title: "오늘 나의 속도를 동물로 고르면?",
-      short: "속도",
-      choices: [
-        { label: "멈춰버린 달팽이", value: 1 },
-        { label: "느릿한 거북이", value: 2 },
-        { label: "널브러진 나무늘보", value: 2 },
-      ],
-    },
+    { emoji: "🛋️", title: "아무것도 하기 싫은 상태가 몸의 피로에 더 가깝나요, 마음의 소진에 더 가깝나요?", short: "성격", choices: [{ label: "둘 다 많이 섞여 있어요", value: 1 }, { label: "마음의 소진 쪽이 더 커요", value: 2 }, { label: "몸이 쉬지 못한 영향이 커요", value: 2 }] },
+    { emoji: "🔋", title: "지금의 에너지 수준을 현실적으로 표현하면 어떤가요?", short: "에너지", choices: [{ label: "거의 바닥이에요", value: 1 }, { label: "기본적인 것만 겨우 해요", value: 2 }, { label: "시작만 하면 조금은 할 수 있어요", value: 3 }] },
+    { emoji: "🧠", title: "이 상태에서 가장 힘든 점은 무엇인가요?", short: "어려움", choices: [{ label: "시작 자체가 너무 어려워요", value: 1 }, { label: "해야 한다는 생각이 더 버거워요", value: 2 }, { label: "하고 싶지 않은 마음이 커요", value: 2 }] },
+    { emoji: "🫶", title: "지금 나에게 가장 덜 부담스러운 행동은 무엇일까요?", short: "한걸음", choices: [{ label: "물 한 잔 마시기 같은 아주 작은 일", value: 3 }, { label: "잠깐 몸을 움직이는 것", value: 3 }, { label: "아직은 아무것도 떠오르지 않아요", value: 1 }] },
+    { emoji: "📆", title: "무기력한 상태가 얼마나 이어지고 있나요?", short: "기간", choices: [{ label: "꽤 계속되고 있어요", value: 1 }, { label: "며칠째 반복돼요", value: 2 }, { label: "오늘 유난히 심해요", value: 2 }] },
+    { emoji: "🪞", title: "이럴 때 스스로를 어떻게 대하는 편인가요?", short: "자기대함", choices: [{ label: "자꾸 게으르다고 몰아붙여요", value: 1 }, { label: "답답하지만 버티는 중이에요", value: 2 }, { label: "지금은 쉬어야 할 신호라고 보려 해요", value: 3 }] },
   ],
   burnout: [
-    {
-      emoji: "🔥",
-      title: "무엇이 가장 지치게 했나요?",
-      short: "원인",
-      choices: [
-        { label: "일이나 공부", value: 2 },
-        { label: "사람 관계", value: 2 },
-        { label: "쉼 없이 달려와서", value: 1 },
-        { label: "이유 모를 소진이요", value: 1 },
-      ],
-    },
-    {
-      emoji: "🛏️",
-      title: "제대로 쉰 게 언제인가요?",
-      short: "쉼",
-      choices: [
-        { label: "최근에 쉬었어요", value: 3 },
-        { label: "꽤 오래됐어요", value: 2 },
-        { label: "기억이 안 나요", value: 1 },
-      ],
-    },
-    {
-      emoji: "📣",
-      title: "지금 몸이 보내는 신호는 무엇인가요?",
-      short: "신호",
-      choices: [
-        { label: "잠이 많이 부족해요", value: 2 },
-        { label: "여기저기 뻐근해요", value: 2 },
-        { label: "마음이 먼저 지쳤어요", value: 1 },
-      ],
-    },
-    {
-      emoji: "⚖️",
-      title: "요즘 '해야 해'와 '하고 싶어', 어느 쪽이 크나요?",
-      short: "균형",
-      choices: [
-        { label: "온통 '해야 해'뿐이에요", value: 1 },
-        { label: "반반쯤이요", value: 2 },
-        { label: "'하고 싶어'도 조금 있어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🕯️",
-      title: "지금 나에게 허락하고 싶은 건?",
-      short: "허락",
-      choices: [
-        { label: "아무것도 안 할 권리", value: 3 },
-        { label: "조금 못해도 괜찮다는 것", value: 3 },
-        { label: "누군가에게 기대는 것", value: 3 },
-      ],
-    },
+    { emoji: "🪫", title: "지침의 강도가 단순 피로를 넘었다고 느껴지나요?", short: "강도", choices: [{ label: "일반적인 피로 이상이에요", value: 1 }, { label: "쉬어도 잘 회복되지 않아요", value: 1 }, { label: "피곤하지만 회복 가능해 보여요", value: 3 }] },
+    { emoji: "📣", title: "몸이나 마음이 보내는 신호 중 가장 두드러지는 것은 무엇인가요?", short: "신호", choices: [{ label: "의욕이 거의 안 생겨요", value: 1 }, { label: "잠과 휴식이 충분하지 않아요", value: 2 }, { label: "예민함이 커졌어요", value: 2 }] },
+    { emoji: "⚖️", title: "요즘 생활은 '버티기'와 '회복하기' 중 어디에 더 치우쳐 있나요?", short: "균형", choices: [{ label: "거의 버티기만 하고 있어요", value: 1 }, { label: "버티는 쪽이 훨씬 커요", value: 2 }, { label: "조금씩 회복도 챙기고 있어요", value: 3 }] },
+    { emoji: "🧱", title: "지금 가장 큰 부담은 무엇에 가깝나요?", short: "부담", choices: [{ label: "해야 할 일의 양", value: 2 }, { label: "쉬지 못하는 구조", value: 1 }, { label: "기대에 맞춰야 한다는 압박", value: 1 }] },
+    { emoji: "🕯️", title: "나에게 허락이 필요한 것이 있다면 무엇일까요?", short: "허락", choices: [{ label: "잠시 멈추는 것", value: 3 }, { label: "완벽하지 않아도 되는 것", value: 3 }, { label: "도움을 요청하는 것", value: 3 }] },
+    { emoji: "🌱", title: "회복을 위해 오늘 현실적으로 가능한 한 가지는 무엇인가요?", short: "회복한걸음", choices: [{ label: "일정을 하나 줄이는 것", value: 3 }, { label: "아무 생산성 없는 휴식을 갖는 것", value: 3 }, { label: "누군가에게 현재 상태를 말하는 것", value: 3 }] },
   ],
   lonely: [
-    {
-      emoji: "🌙",
-      title: "지금 곁에 누가 있으면 좋겠나요?",
-      short: "바람",
-      choices: [
-        { label: "특정한 그 사람이요", value: 3 },
-        { label: "누구든 곁에 있으면", value: 2 },
-        { label: "사실 혼자가 편해요", value: 3 },
-      ],
-    },
-    {
-      emoji: "💬",
-      title: "오늘 마음을 나눈 대화가 있었나요?",
-      short: "대화",
-      choices: [
-        { label: "거의 없었어요", value: 1 },
-        { label: "형식적인 것뿐이에요", value: 2 },
-        { label: "조금 있었어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🌊",
-      title: "이 외로움은 어떤 결인가요?",
-      short: "결",
-      choices: [
-        { label: "사무치게 깊어요", value: 1 },
-        { label: "잔잔히 있어요", value: 2 },
-        { label: "익숙한 편이에요", value: 2 },
-      ],
-    },
-    {
-      emoji: "📱",
-      title: "지금 누군가에게 연락한다면?",
-      short: "연락",
-      choices: [
-        { label: "용기가 잘 안 나요", value: 1 },
-        { label: "할까 말까 망설여져요", value: 2 },
-        { label: "한번 해볼까 싶어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🫂",
-      title: "이 마음을 누가 알아주면 좋겠나요?",
-      short: "이해",
-      choices: [
-        { label: "딱 한 사람이면 돼요", value: 2 },
-        { label: "그냥 누구라도요", value: 2 },
-        { label: "나라도 나를 알아주자 싶어요", value: 3 },
-      ],
-    },
+    { emoji: "🌙", title: "외로움이 가장 크게 느껴지는 순간은 어떤 때인가요?", short: "순간", choices: [{ label: "혼자 있는 시간이 길어질 때", value: 2 }, { label: "사람들 사이에 있어도 연결감이 없을 때", value: 1 }, { label: "밤이 되면 더 커져요", value: 2 }] },
+    { emoji: "💬", title: "오늘 마음을 나눌 수 있는 대화가 있었나요?", short: "대화", choices: [{ label: "거의 없었어요", value: 1 }, { label: "피상적인 대화만 있었어요", value: 2 }, { label: "짧게라도 있었어요", value: 3 }] },
+    { emoji: "🫂", title: "지금 필요한 연결은 어떤 형태에 더 가깝나요?", short: "연결", choices: [{ label: "한 사람의 깊은 이해", value: 3 }, { label: "가벼운 안부라도 좋겠어요", value: 2 }, { label: "지금은 누가 곁에 있다는 감각만 있어도 돼요", value: 2 }] },
+    { emoji: "📱", title: "먼저 연락을 시도하는 일은 지금 어떤가요?", short: "연락", choices: [{ label: "용기가 잘 안 나요", value: 1 }, { label: "망설여지지만 가능할 것 같아요", value: 2 }, { label: "가볍게는 해볼 수 있어요", value: 3 }] },
+    { emoji: "🧠", title: "외로울 때 주로 어떤 생각이 따라오나요?", short: "생각", choices: [{ label: "아무도 나를 잘 모르는 것 같아요", value: 1 }, { label: "말해도 잘 이해받지 못할 것 같아요", value: 2 }, { label: "그냥 연결이 부족한 하루였다고 느껴요", value: 3 }] },
+    { emoji: "🏠", title: "지금 나를 가장 덜 외롭게 해줄 것은 무엇일까요?", short: "완화", choices: [{ label: "신뢰하는 사람 한 명과의 연결", value: 3 }, { label: "일상적인 온기 하나", value: 3 }, { label: "우선 나를 안정시키는 시간", value: 3 }] },
   ],
   angry: [
-    {
-      emoji: "⚡",
-      title: "무엇이 당신을 화나게 했나요?",
-      short: "계기",
-      choices: [
-        { label: "누군가의 말이나 행동", value: 2 },
-        { label: "일이 안 풀려서", value: 2 },
-        { label: "반복되는 상황이요", value: 1 },
-        { label: "콕 집기 어려워요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🌡️",
-      title: "그 화, 지금 얼마나 큰가요?",
-      short: "크기",
-      choices: [
-        { label: "부글부글 끓어올라요", value: 1 },
-        { label: "욱하다 가라앉는 중", value: 2 },
-        { label: "남은 잔불 정도예요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🌬️",
-      title: "이 감정을 어떻게 하고 싶나요?",
-      short: "바람",
-      choices: [
-        { label: "시원하게 풀고 싶어요", value: 3 },
-        { label: "이해받고 싶어요", value: 3 },
-        { label: "혼자 삭이고 싶어요", value: 2 },
-      ],
-    },
-    {
-      emoji: "🌋",
-      title: "지금 이 화를 온도로 재면?",
-      short: "온도",
-      choices: [
-        { label: "용암급 부글부글", value: 1 },
-        { label: "펄펄 끓는 물", value: 2 },
-        { label: "미지근해지는 중", value: 3 },
-      ],
-    },
-    {
-      emoji: "🥊",
-      title: "속으로 하고 싶은 말, 있나요?",
-      short: "속말",
-      choices: [
-        { label: "엄청 많아요", value: 2 },
-        { label: "딱 한마디 있어요", value: 2 },
-        { label: "말해도 소용없을 것 같아요", value: 1 },
-      ],
-    },
+    { emoji: "⚡", title: "지금 화를 만든 핵심은 무엇에 가장 가깝나요?", short: "핵심", choices: [{ label: "존중받지 못한 느낌", value: 1 }, { label: "반복되는 상황에 대한 피로", value: 2 }, { label: "예상과 다른 결과", value: 2 }] },
+    { emoji: "🌡️", title: "화의 강도는 지금 어느 정도인가요?", short: "강도", choices: [{ label: "몸으로 느껴질 만큼 커요", value: 1 }, { label: "말만 꺼내면 다시 올라와요", value: 2 }, { label: "많이 줄었지만 남아 있어요", value: 3 }] },
+    { emoji: "🧠", title: "화 아래에 다른 감정이 같이 있나요?", short: "이면감정", choices: [{ label: "서운함이 커요", value: 2 }, { label: "억울함이 커요", value: 2 }, { label: "지금은 화가 가장 앞에 있어요", value: 2 }] },
+    { emoji: "🗣️", title: "지금 필요한 것은 무엇에 더 가깝나요?", short: "필요", choices: [{ label: "내 입장을 정확히 말하는 것", value: 3 }, { label: "조금 진정할 시간", value: 3 }, { label: "이해받고 있다는 감각", value: 3 }] },
+    { emoji: "🧯", title: "이 감정을 다루는 방식은 현재 어떤가요?", short: "다루기", choices: [{ label: "억누르고 있어요", value: 1 }, { label: "터뜨릴까 봐 조심 중이에요", value: 2 }, { label: "조금씩 정리되고 있어요", value: 3 }] },
+    { emoji: "📍", title: "이 화가 나에게 알려주는 경계는 무엇일까요?", short: "경계", choices: [{ label: "넘기기 어려운 선이 있었어요", value: 3 }, { label: "반복되면 안 되는 상황이었어요", value: 3 }, { label: "내가 중요하게 여기는 것이 건드려졌어요", value: 3 }] },
   ],
   sad: [
-    {
-      emoji: "💧",
-      title: "지금 울고 싶은 마음이 드나요?",
-      short: "눈물",
-      choices: [
-        { label: "이미 울었어요", value: 2 },
-        { label: "울컥울컥해요", value: 2 },
-        { label: "꾹 참고 있어요", value: 1 },
-        { label: "그 정돈 아니에요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🫂",
-      title: "이 슬픔을 어떻게 하고 싶나요?",
-      short: "바람",
-      choices: [
-        { label: "혼자 조용히 있고 싶어요", value: 3 },
-        { label: "누군가에게 기대고 싶어요", value: 3 },
-        { label: "실컷 울고 싶어요", value: 3 },
-      ],
-    },
-    {
-      emoji: "🔎",
-      title: "슬픔의 이유를 알고 있나요?",
-      short: "이유",
-      choices: [
-        { label: "분명히 알아요", value: 3 },
-        { label: "어렴풋이 알아요", value: 2 },
-        { label: "이유 없이 슬퍼요", value: 1 },
-      ],
-    },
-    {
-      emoji: "🌧️",
-      title: "이 슬픔이 머문 지는 얼마나 됐나요?",
-      short: "기간",
-      choices: [
-        { label: "오늘 갑자기 찾아왔어요", value: 2 },
-        { label: "며칠째 머물러요", value: 1 },
-        { label: "오래된 것 같아요", value: 1 },
-      ],
-    },
-    {
-      emoji: "🕊️",
-      title: "이 눈물이 지나고 나면 어떨 것 같나요?",
-      short: "이후",
-      choices: [
-        { label: "조금은 가벼워질 것 같아요", value: 3 },
-        { label: "잘 모르겠어요", value: 2 },
-        { label: "또 찾아올 것 같아요", value: 1 },
-      ],
-    },
+    { emoji: "💧", title: "슬픔이 지금 어느 정도로 머물러 있나요?", short: "정도", choices: [{ label: "쉽게 가라앉지 않을 만큼 커요", value: 1 }, { label: "계속 배경처럼 남아 있어요", value: 2 }, { label: "올라오지만 견딜 수는 있어요", value: 3 }] },
+    { emoji: "🔎", title: "슬픔의 이유가 비교적 분명한 편인가요?", short: "이유", choices: [{ label: "분명한 이유가 있어요", value: 3 }, { label: "어렴풋이만 알아요", value: 2 }, { label: "이유 없이 가라앉아요", value: 1 }] },
+    { emoji: "🫂", title: "이 감정 앞에서 가장 필요한 것은 무엇일까요?", short: "필요", choices: [{ label: "조용히 머물 시간", value: 3 }, { label: "누군가의 공감", value: 3 }, { label: "울어도 괜찮은 안전함", value: 3 }] },
+    { emoji: "🧠", title: "슬플 때 스스로에게 어떤 말을 가장 많이 하나요?", short: "자기말", choices: [{ label: "자꾸 버티라고 해요", value: 1 }, { label: "이유를 찾으려 애써요", value: 2 }, { label: "그럴 수 있다고 말해주려 해요", value: 3 }] },
+    { emoji: "🕰️", title: "이 슬픔이 이어지는 시간감각은 어떤가요?", short: "지속", choices: [{ label: "며칠 이상 길게 느껴져요", value: 1 }, { label: "오늘 특히 크게 느껴져요", value: 2 }, { label: "파도처럼 오고 가요", value: 2 }] },
+    { emoji: "🌿", title: "지금의 슬픔을 조금 덜 외롭게 만들 수 있는 것이 있다면 무엇일까요?", short: "완화", choices: [{ label: "말하지 않아도 곁에 있어주는 사람", value: 3 }, { label: "감정을 흘려보낼 시간", value: 3 }, { label: "스스로를 덜 재촉하는 태도", value: 3 }] },
   ],
 };
 
-// 기분당 추가 질문 5개 (위 5개와 합쳐 총 10개 풀)
-export const moodQuestionsExtra: Record<string, MoodQuestion[]> = {
-  happy: [
-    { emoji: "🎁", title: "이 좋은 기분, 누구에게 나눠주고 싶나요?", short: "나눔", choices: [{ label: "가까운 사람에게", value: 4 }, { label: "만나는 모두에게", value: 4 }, { label: "우선 나 자신에게", value: 3 }] },
-    { emoji: "🌈", title: "오늘을 색으로 칠한다면?", short: "색", choices: [{ label: "쨍한 노랑", value: 4 }, { label: "따뜻한 주황", value: 4 }, { label: "맑은 하늘색", value: 3 }] },
-    { emoji: "🎵", title: "지금 어울리는 BGM은?", short: "BGM", choices: [{ label: "신나는 팝", value: 4 }, { label: "콧노래 절로", value: 4 }, { label: "잔잔한 발라드", value: 3 }] },
-    { emoji: "⭐", title: "오늘 나에게 별점을 준다면?", short: "별점", choices: [{ label: "별 다섯 개!", value: 4 }, { label: "기대 이상이었어요", value: 4 }, { label: "네 개쯤은 돼요", value: 3 }] },
-    { emoji: "💐", title: "이 기분을 내일까지 데려가려면?", short: "이어가기", choices: [{ label: "오늘 푹 자두기", value: 4 }, { label: "기록해두기", value: 4 }, { label: "그냥 실컷 즐기기", value: 3 }] },
-  ],
-  flutter: [
-    { emoji: "🎬", title: "이 설렘이 영화 장면이라면?", short: "장면", choices: [{ label: "설레는 첫 만남", value: 4 }, { label: "두근대는 고백", value: 4 }, { label: "반가운 재회", value: 4 }] },
-    { emoji: "🌟", title: "설렘 지수를 별로 매기면?", short: "지수", choices: [{ label: "별 다섯 개", value: 4 }, { label: "별 네 개", value: 4 }, { label: "별 세 개", value: 3 }] },
-    { emoji: "📞", title: "이 마음, 누구에게 말하고 싶나요?", short: "공유", choices: [{ label: "절친에게 자랑", value: 4 }, { label: "그 사람에게", value: 3 }, { label: "혼자 간직", value: 3 }] },
-    { emoji: "🍬", title: "이 설렘의 맛을 고르면?", short: "맛", choices: [{ label: "달콤한 솜사탕", value: 4 }, { label: "톡 쏘는 사이다", value: 4 }, { label: "새콤달콤 사탕", value: 3 }] },
-    { emoji: "🎈", title: "지금 마음이 붕 떠 있나요?", short: "부력", choices: [{ label: "둥둥 떠 있어요", value: 4 }, { label: "구름 위 같아요", value: 4 }, { label: "살짝 들떠요", value: 3 }] },
-  ],
-  calm: [
-    { emoji: "🛶", title: "오늘 마음의 흐름은?", short: "흐름", choices: [{ label: "잔잔한 호수", value: 4 }, { label: "느린 강물", value: 3 }, { label: "고인 물 같기도", value: 2 }] },
-    { emoji: "🍵", title: "지금 딱 하고 싶은 건?", short: "하고픔", choices: [{ label: "따뜻한 차 한 잔", value: 4 }, { label: "가만히 멍때리기", value: 3 }, { label: "딱히 없어요", value: 3 }] },
-    { emoji: "🌤️", title: "오늘 마음 날씨 예보는?", short: "예보", choices: [{ label: "대체로 맑음", value: 4 }, { label: "구름 조금", value: 3 }, { label: "무난한 흐림", value: 3 }] },
-    { emoji: "🧩", title: "오늘 하루의 완성도는?", short: "완성도", choices: [{ label: "무난히 채웠어요", value: 3 }, { label: "그럭저럭이요", value: 3 }, { label: "조금 비어 보여요", value: 2 }] },
-    { emoji: "🕊️", title: "지금 마음에 걸리는 게 있나요?", short: "걸림", choices: [{ label: "없어요, 평온해요", value: 4 }, { label: "사소한 것 하나", value: 3 }, { label: "뭔가 좀 허전해요", value: 2 }] },
-  ],
-  down: [
-    { emoji: "🌫️", title: "지금 마음의 시야는 어떤가요?", short: "시야", choices: [{ label: "온통 뿌옇어요", value: 1 }, { label: "조금 흐릿해요", value: 2 }, { label: "그래도 보여요", value: 3 }] },
-    { emoji: "🫀", title: "가슴이 답답하게 느껴지나요?", short: "답답", choices: [{ label: "많이요", value: 1 }, { label: "조금요", value: 2 }, { label: "그건 괜찮아요", value: 3 }] },
-    { emoji: "🔦", title: "오늘 작은 빛 하나쯤 있었나요?", short: "빛", choices: [{ label: "딱히 없었어요", value: 1 }, { label: "작게 하나 있었어요", value: 3 }, { label: "찾아보면 있을 듯", value: 2 }] },
-    { emoji: "🧸", title: "지금 위로가 되는 건 무엇인가요?", short: "위로", choices: [{ label: "따뜻한 이불 속", value: 3 }, { label: "좋아하는 음악", value: 3 }, { label: "잘 모르겠어요", value: 2 }] },
-    { emoji: "🕰️", title: "이 기분에 시간을 준다면?", short: "시간", choices: [{ label: "좀 오래 걸릴 듯", value: 1 }, { label: "며칠이면 나아질 듯", value: 2 }, { label: "곧 괜찮아질 것 같아요", value: 3 }] },
-  ],
-  anxious: [
-    { emoji: "🌪️", title: "머릿속이 얼마나 시끄러운가요?", short: "소음", choices: [{ label: "폭풍이 몰아쳐요", value: 1 }, { label: "웅성웅성해요", value: 2 }, { label: "조용한 편이에요", value: 3 }] },
-    { emoji: "🫁", title: "지금 숨은 어떤가요?", short: "숨", choices: [{ label: "얕고 빨라요", value: 1 }, { label: "조금 답답해요", value: 2 }, { label: "고른 편이에요", value: 3 }] },
-    { emoji: "🛡️", title: "최악의 상황을 자꾸 상상하나요?", short: "상상", choices: [{ label: "자꾸 그래요", value: 1 }, { label: "가끔요", value: 2 }, { label: "아니요", value: 3 }] },
-    { emoji: "✍️", title: "그 걱정, 적어두면 좀 나을까요?", short: "정리", choices: [{ label: "이미 정리해봤어요", value: 4 }, { label: "도움 될 것 같아요", value: 3 }, { label: "해봐야 알 듯해요", value: 2 }] },
-    { emoji: "🤲", title: "지금 붙잡을 수 있는 '확실한 것'은?", short: "지금", choices: [{ label: "여기, 이 순간이요", value: 3 }, { label: "하나쯤 있어요", value: 3 }, { label: "잘 안 보여요", value: 1 }] },
-  ],
-  empty: [
-    { emoji: "🍽️", title: "오늘 끼니는 챙겼나요?", short: "끼니", choices: [{ label: "챙겨 먹었어요", value: 3 }, { label: "대충 때웠어요", value: 2 }, { label: "걸렀어요", value: 1 }] },
-    { emoji: "🪟", title: "지금 커튼은 열려 있나요?", short: "햇빛", choices: [{ label: "활짝 열려 있어요", value: 3 }, { label: "조금 열려 있어요", value: 2 }, { label: "다 닫혀 있어요", value: 1 }] },
-    { emoji: "🎯", title: "딱 하나 한다면 뭐가 제일 쉬울까요?", short: "한걸음", choices: [{ label: "물 한 잔 마시기", value: 3 }, { label: "세수하기", value: 3 }, { label: "그것도 모르겠어요", value: 2 }] },
-    { emoji: "📉", title: "지금 의욕 그래프는?", short: "의욕", choices: [{ label: "바닥에 일자예요", value: 1 }, { label: "살짝 꿈틀해요", value: 2 }, { label: "오르락내리락", value: 2 }] },
-    { emoji: "☁️", title: "이 무기력함은 어떤 무게인가요?", short: "무게", choices: [{ label: "온몸을 눌러요", value: 1 }, { label: "어깨쯤에 얹혀요", value: 2 }, { label: "안개처럼 가벼워요", value: 3 }] },
-  ],
-  burnout: [
-    { emoji: "😴", title: "요즘 잠은 어떤가요?", short: "잠", choices: [{ label: "자도 개운치 않아요", value: 1 }, { label: "자꾸 뒤척여요", value: 2 }, { label: "그럭저럭 자요", value: 3 }] },
-    { emoji: "🪫", title: "재충전에 필요한 건 무엇일까요?", short: "충전", choices: [{ label: "긴 휴식이요", value: 2 }, { label: "혼자만의 시간", value: 3 }, { label: "그냥 아무것도", value: 2 }] },
-    { emoji: "🎭", title: "괜찮은 척하고 있진 않나요?", short: "가면", choices: [{ label: "계속 그래요", value: 1 }, { label: "가끔요", value: 2 }, { label: "아니요", value: 3 }] },
-    { emoji: "📵", title: "잠깐 다 꺼두고 싶나요?", short: "차단", choices: [{ label: "정말 그래요", value: 2 }, { label: "조금요", value: 3 }, { label: "아니요", value: 3 }] },
-    { emoji: "🌱", title: "아주 작게라도 위안이 되는 건?", short: "위안", choices: [{ label: "곧 쉴 수 있다는 것", value: 3 }, { label: "따뜻한 것 하나", value: 3 }, { label: "잘 모르겠어요", value: 1 }] },
-  ],
-  lonely: [
-    { emoji: "🪟", title: "창밖 불빛을 보면 어떤가요?", short: "불빛", choices: [{ label: "더 외로워져요", value: 1 }, { label: "그냥 그래요", value: 2 }, { label: "포근하기도 해요", value: 3 }] },
-    { emoji: "📖", title: "이 마음을 어디에 털어놓고 싶나요?", short: "털어놓기", choices: [{ label: "누군가에게요", value: 3 }, { label: "일기장에요", value: 2 }, { label: "아무 데도 못하겠어요", value: 1 }] },
-    { emoji: "🐾", title: "지금 곁에 뭐가 있으면 좋겠나요?", short: "곁", choices: [{ label: "사람의 온기", value: 2 }, { label: "포근한 반려동물", value: 3 }, { label: "따뜻한 담요", value: 3 }] },
-    { emoji: "🌙", title: "이 밤이 길게 느껴지나요?", short: "밤", choices: [{ label: "아주 길어요", value: 1 }, { label: "조금 길어요", value: 2 }, { label: "견딜 만해요", value: 3 }] },
-    { emoji: "💌", title: "지금 누군가 연락이 온다면?", short: "연락받기", choices: [{ label: "무척 고마울 듯", value: 3 }, { label: "정말 반가울 듯", value: 2 }, { label: "부담될 수도 있어요", value: 2 }] },
-  ],
-  angry: [
-    { emoji: "🎤", title: "이 화를 한 문장으로 외친다면?", short: "외침", choices: [{ label: "\"너무하잖아!\"", value: 2 }, { label: "\"이해가 안 돼!\"", value: 2 }, { label: "\"나도 힘들다고!\"", value: 2 }] },
-    { emoji: "⏰", title: "이 화, 얼마나 갈 것 같나요?", short: "지속", choices: [{ label: "꽤 오래갈 듯", value: 1 }, { label: "조금 있다 풀릴 듯", value: 2 }, { label: "벌써 풀리는 중", value: 3 }] },
-    { emoji: "🧯", title: "화를 식히는 나만의 방법이 있나요?", short: "진화법", choices: [{ label: "이미 쓰는 중이에요", value: 3 }, { label: "있긴 해요", value: 3 }, { label: "딱히 없어요", value: 2 }] },
-    { emoji: "🥤", title: "지금 당장 하고 싶은 건?", short: "당장", choices: [{ label: "시원한 거 마시기", value: 3 }, { label: "혼자 있기", value: 2 }, { label: "소리 지르기", value: 2 }] },
-    { emoji: "🪞", title: "사실은 서운한 마음도 있나요?", short: "이면", choices: [{ label: "많이요", value: 2 }, { label: "조금요", value: 2 }, { label: "아니요, 그냥 화예요", value: 2 }] },
-  ],
-  sad: [
-    { emoji: "🌧️", title: "이 슬픔의 세기는 어느 정도인가요?", short: "세기", choices: [{ label: "장대비처럼요", value: 1 }, { label: "보슬비처럼요", value: 2 }, { label: "그쳐가는 중이에요", value: 3 }] },
-    { emoji: "🫂", title: "지금 누가 안아주면 좋겠나요?", short: "품", choices: [{ label: "그 사람이요", value: 3 }, { label: "누구든지요", value: 2 }, { label: "나 자신이요", value: 3 }] },
-    { emoji: "🎵", title: "지금 어울리는 노래는?", short: "노래", choices: [{ label: "위로가 되는 곡", value: 3 }, { label: "잔잔한 피아노", value: 3 }, { label: "슬픈 발라드", value: 2 }] },
-    { emoji: "💭", title: "이 감정을 참고 있진 않나요?", short: "억누름", choices: [{ label: "흘려보내는 중이에요", value: 3 }, { label: "조금 참아요", value: 2 }, { label: "꾹 참고 있어요", value: 1 }] },
-    { emoji: "🌱", title: "이 슬픔이 나에게 무엇을 남길까요?", short: "의미", choices: [{ label: "조금 단단해질 듯", value: 3 }, { label: "잘 모르겠어요", value: 2 }, { label: "그냥 아픔뿐이에요", value: 1 }] },
-  ],
-};
-
-/** 시작할 때마다 기분 풀(10개)에서 질문 n개를 무작위로 골라 반환 */
+/** 시작할 때마다 구조화된 질문 풀에서 질문 n개를 무작위로 골라 반환 */
 export function buildMoodQuestions(moodId: string, n = 6): MoodQuestion[] {
-  const pool = [
-    ...(moodQuestions[moodId] || []),
-    ...(moodQuestionsExtra[moodId] || []),
-  ];
+  const pool = [...(structuredMoodQuestions[moodId] || [])];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -660,28 +128,28 @@ export function computeProfile(values: number[]): Profile {
     label = "한결 가벼운 하루";
     emoji = "🌟";
     summary =
-      "마음이 밝고 가벼운 쪽에 있어요. 이 좋은 기운을 오래 간직해 두세요.";
+      "전반적인 정서 상태가 비교적 안정적이에요. 현재의 리듬과 자원을 잘 유지하고 있는 하루로 볼 수 있습니다.";
   } else if (avg >= 2.6) {
     label = "잔잔히 흘러가는 하루";
     emoji = "🍃";
     summary =
-      "크게 치우침 없이 잔잔하게 흘러가는 하루예요. 그 자체로 충분히 잘 지내고 있어요.";
+      "감정 기복이 크지 않고 비교적 균형을 유지하고 있어요. 무리하지 않는 선에서 일상을 이어가기 좋은 상태에 가깝습니다.";
   } else if (avg >= 1.9) {
     label = "조금 버거운 하루";
     emoji = "🌥️";
     summary =
-      "버겁고 무거운 부분이 있었던 하루네요. 오늘은 나를 조금 더 다정하게 대해도 돼요.";
+      "정서적 부담이 평소보다 조금 높게 나타나요. 바로 해결하려 하기보다 현재 부담을 줄이는 접근이 더 적절해 보입니다.";
   } else {
     label = "돌봄이 필요한 하루";
     emoji = "🌧️";
     summary =
-      "마음이 많이 무거운 하루예요. 여기까지 버텨온 것만으로 충분히 애썼어요. 오늘은 나를 돌보는 걸 가장 앞에 두어요.";
+      "정서적 소모가 크게 누적된 상태로 보여요. 오늘은 성과보다 회복과 안정 확보를 우선에 두는 편이 필요합니다.";
   }
 
   const profile: Profile = { avg, label, emoji, summary };
   if (avg <= 1.6) {
     profile.gentleSupport =
-      "혹시 이런 마음이 며칠째 이어지고 있다면, 믿을 만한 사람이나 전문가에게 마음을 나눠보는 것도 좋은 방법이에요. 당신은 혼자가 아니에요.";
+      "이런 상태가 며칠 이상 이어지거나 수면, 식사, 집중 같은 일상 기능에 분명한 영향을 주고 있다면 신뢰할 수 있는 사람이나 전문가와 연결해보는 것을 권합니다.";
   }
   return profile;
 }
@@ -706,7 +174,7 @@ const ACK_ADV = ["", "살짝", "조금", "", "꽤", "많이"]; // intensity 1~5
 export function acknowledgment(moodId: string, intensity: number): string {
   const adv = ACK_ADV[intensity] ?? "";
   const adj = feelingAdj[moodId] ?? "";
-  return `오늘은 ${adv ? adv + " " : ""}${adj} 하루였군요.`;
+  return `오늘은 ${adv ? adv + " " : ""}${adj} 상태가 비교적 분명하게 느껴진 하루였어요.`;
 }
 
 // --- 메모 반영: 적은 한 줄에서 키워드를 알아채 맞춤 문장을 더해요 (API 없이) ---
@@ -759,7 +227,13 @@ export function reflectNote(note: string): string | null {
 
 // --- 상담 소견: 실제 답변을 읽어 개인화된 리딩 + 구체적 제안 ---
 export type AnalysisItem = { short: string; answer: string; value: number };
-export type Analysis = { read: string; suggestion: string; caution?: string };
+export type Analysis = {
+  read: string;
+  observed: string;
+  meaning: string;
+  suggestion: string;
+  caution?: string;
+};
 
 const ANALYSIS_DEG = ["", "아주 옅게", "옅게", "적당한 세기로", "꽤 뚜렷하게", "매우 강하게"];
 
@@ -807,6 +281,62 @@ const suggestions: Record<string, string[]> = {
   ],
 };
 
+const meaningByMood: Record<string, string[]> = {
+  happy: [
+    "좋은 감정이 비교적 안정적으로 유지되고 있다는 건, 지금 생활 안에 나를 지탱하는 자원이 분명히 있다는 뜻일 수 있어요.",
+    "기분이 좋은 날에도 그 이유를 알아차려 두면 이후 컨디션이 흔들릴 때 다시 돌아올 기준이 생깁니다.",
+  ],
+  flutter: [
+    "설렘은 기대가 살아 있다는 신호이지만, 긴장이 함께 있을 때는 감정 소모도 커질 수 있어요.",
+    "두근거림 자체보다 그 감정이 나를 앞으로 움직이게 하는지, 혹은 불안하게 만드는지를 구분해보는 것이 중요해요.",
+  ],
+  calm: [
+    "잔잔한 상태는 특별하지 않아 보여도 실제로는 회복이 작동하고 있다는 신호일 수 있어요.",
+    "극적인 감정이 없다는 건 무감각과는 다릅니다. 오히려 생활 리듬이 비교적 안정돼 있다는 뜻일 수 있어요.",
+  ],
+  down: [
+    "가라앉은 마음은 의지가 부족해서라기보다, 에너지와 정서 자원이 줄어든 상태에서 흔히 나타나는 반응이에요.",
+    "이럴 때 중요한 건 감정을 빨리 바꾸는 것보다 지금의 무게를 정확히 인정하고 부담을 줄이는 쪽이에요.",
+  ],
+  anxious: [
+    "불안은 실제 위험보다 '예상되는 부담'을 먼저 계산하려는 마음의 경계 반응일 때가 많아요.",
+    "생각이 반복될수록 불안은 커지기 쉬워요. 그래서 원인을 다 없애기보다 지금 다룰 수 있는 범위를 좁히는 게 도움이 됩니다.",
+  ],
+  empty: [
+    "무기력은 게으름의 문제가 아니라, 소진이나 부담이 오래 누적됐을 때 흔히 나타나는 정지 반응일 수 있어요.",
+    "아무것도 하기 싫다는 상태에는 종종 회복이 먼저 필요하다는 신호가 들어 있습니다.",
+  ],
+  burnout: [
+    "지침이 길어질수록 '조금만 더'로 버티는 방식은 오히려 회복을 늦출 수 있어요.",
+    "소진은 의욕의 문제가 아니라 자원 고갈의 문제에 더 가까워서, 회복을 위한 구조 조정이 필요할 때가 많아요.",
+  ],
+  lonely: [
+    "외로움은 관계의 수보다 '정서적으로 연결되어 있다는 감각'이 부족할 때 더 크게 느껴지곤 해요.",
+    "혼자 있는 것 자체보다 이해받지 못할 것 같다는 예상이 외로움을 더 깊게 만드는 경우도 많아요.",
+  ],
+  angry: [
+    "분노는 대개 지켜지지 않은 기대, 침해된 경계, 혹은 누적된 피로가 밖으로 드러나는 방식이에요.",
+    "화가 크다는 사실보다 중요한 건 그 안에 어떤 요구와 상처가 숨어 있는지를 읽어내는 일이에요.",
+  ],
+  sad: [
+    "슬픔은 약함의 증거라기보다 상실, 실망, 피로처럼 중요한 정서적 사건을 통과하고 있다는 신호에 가까워요.",
+    "이 감정을 너무 빨리 정리하려고 하면 오히려 더 오래 남을 수 있어서, 안전하게 머물 수 있는 시간이 필요할 때가 있어요.",
+  ],
+};
+
+function buildObserved(
+  low: AnalysisItem | undefined,
+  high: AnalysisItem | undefined
+): string {
+  if (low && high && low.short !== high.short && high.value - low.value >= 1) {
+    return `이번 체크인에서는 '${low.short}' 영역에서 부담이 가장 크게 나타났고, '${high.short}' 영역에서는 상대적으로 유지되는 기능이 확인돼요. 전반적으로는 힘든 요소가 분명하지만, 동시에 버티고 있는 자원도 남아 있는 상태로 해석됩니다.`;
+  }
+  if (low) {
+    return `이번 체크인에서는 '${low.short}'와 관련된 반응이 가장 무겁게 나타났어요. 현재 마음의 부담이 특히 그 지점에 집중돼 있다고 볼 수 있습니다.`;
+  }
+  return "이번 체크인에서는 몇 가지 부담이 겹쳐 있지만, 현재 상태를 이해할 수 있는 단서도 함께 드러나고 있습니다.";
+}
+
 function pickOne<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -824,22 +354,24 @@ export function computeAnalysis(
   const adj = feelingAdj[moodId] || "";
   const deg = ANALYSIS_DEG[intensity] || "";
 
-  let read = `선택하신 답을 종합하면, 오늘은 ${adj} 감정이 ${deg} 자리 잡은 하루였어요.`;
+  let read = `선택하신 답을 종합하면, 오늘은 ${adj} 감정이 ${deg} 지속된 하루로 보입니다.`;
   if (low && high && low.short !== high.short && high.value - low.value >= 1) {
-    read += ` 특히 ‘${low.short}’ 쪽(“${low.answer}”)이 가장 무겁게 느껴졌고, 반대로 ‘${high.short}’ 쪽(“${high.answer}”)에서는 그래도 스스로를 지탱하는 힘이 남아 있었어요.`;
+    read += ` 특히 ‘${low.short}’(“${low.answer}”)와 관련된 부담이 두드러졌고, 반대로 ‘${high.short}’(“${high.answer}”)에서는 상대적으로 유지되는 힘이 확인됩니다.`;
   } else if (low) {
-    read += ` 그중 ‘${low.short}’ 부분(“${low.answer}”)이 지금 마음을 가장 크게 누르는 지점으로 보여요.`;
+    read += ` 그중 ‘${low.short}’(“${low.answer}”)이 현재 상태를 가장 크게 압박하는 지점으로 보입니다.`;
   }
 
   const analysis: Analysis = {
     read,
+    observed: buildObserved(low, high),
+    meaning: pickOne(meaningByMood[moodId] || meaningByMood.calm),
     suggestion: pickOne(suggestions[moodId] || suggestions.calm),
   };
 
   const avg = items.reduce((s, i) => s + i.value, 0) / items.length;
   if (avg <= 1.7) {
     analysis.caution =
-      "만약 이런 무거움이 2주 이상 이어지거나 일상(수면·식사·의욕)에 뚜렷한 지장이 생긴다면, 전문 상담을 받아보시길 권해요. 그건 약함이 아니라 나를 돌보는 현명한 선택이에요.";
+      "이런 부담이 2주 이상 이어지거나 수면, 식사, 의욕, 집중 같은 일상 기능에 뚜렷한 저하가 생긴다면 전문 상담이나 진료를 통해 추가 도움을 받는 것을 권합니다.";
   }
   return analysis;
 }
