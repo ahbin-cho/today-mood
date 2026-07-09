@@ -34,8 +34,8 @@ import {
   type QA,
 } from "@/lib/storage";
 import { kst } from "@/lib/time";
-import { getDeviceId } from "@/lib/uid";
-import { pullMoodState, pushMoodState } from "@/lib/cloud";
+import { resolveUid } from "@/lib/uid";
+import { pushToParent } from "@/lib/cloud";
 import ShareCard, { type ShareCardData } from "@/components/ShareCard";
 import {
   Tabs, Tab, DailyBanner, DailyLabel, DailyText, DailyAuthor, SectionLabel,
@@ -134,10 +134,13 @@ export default function MoodApp() {
   const [selfSaved, setSelfSaved] = useState(false);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const uidRef = useRef("");
+  const parentDbRef = useRef(false);
 
-  // 현재 localStorage 상태를 클라우드로 밀어넣기 (미설정이면 no-op)
+  // 부모 DB 모드일 때 부모 사이트에 저장 요청
   const cloudSync = () => {
-    if (uidRef.current) pushMoodState(uidRef.current, loadJournal(), loadSaved());
+    if (parentDbRef.current) {
+      pushToParent(loadJournal(), loadSaved());
+    }
   };
 
   useEffect(() => {
@@ -149,23 +152,22 @@ export default function MoodApp() {
     setSaved(localS);
     // persona is assigned randomly when starting a check-in
 
-    // 클라우드 동기화 (Supabase 설정 시에만 동작)
-    const uid = getDeviceId();
-    uidRef.current = uid;
+    // uid 결정 + 클라우드 동기화
     (async () => {
-      const cloud = await pullMoodState(uid);
-      if (cloud) {
-        const mergedJ: JournalMap = mergeJournals(cloud.journal, localJ);
+      const { uid, parentDb, initialData } = await resolveUid();
+      uidRef.current = uid;
+      parentDbRef.current = parentDb;
+
+      if (parentDb && initialData) {
+        // 부모 DB 모드: 부모가 보내준 데이터와 로컬 병합
+        const mergedJ: JournalMap = mergeJournals(initialData.journal, localJ);
         const byId = new Map<string, SavedItem>();
-        [...cloud.saved, ...localS].forEach((x) => byId.set(x.id, x));
+        [...(initialData.saved || []), ...localS].forEach((x) => byId.set(x.id, x));
         const mergedS = Array.from(byId.values());
         saveJournalAll(mergedJ);
         saveSavedAll(mergedS);
         setJournal(mergedJ);
         setSaved(mergedS);
-        pushMoodState(uid, mergedJ, mergedS);
-      } else {
-        pushMoodState(uid, localJ, localS);
       }
     })();
   }, []);
