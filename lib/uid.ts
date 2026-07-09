@@ -3,15 +3,22 @@ import type { JournalMap, SavedItem } from "./storage";
 
 const UID_KEY = "today-mood:uid:v1";
 
+function lsGet(key: string): string | null {
+  try { return window.localStorage.getItem(key); } catch { return null; }
+}
+function lsSet(key: string, value: string): void {
+  try { window.localStorage.setItem(key, value); } catch { /* 무시 */ }
+}
+
 export function getDeviceId(): string {
   if (typeof window === "undefined") return "";
-  let id = window.localStorage.getItem(UID_KEY);
+  let id = lsGet(UID_KEY);
   if (!id) {
     const g = globalThis as unknown as { crypto?: { randomUUID?: () => string } };
     id =
       g.crypto?.randomUUID?.() ??
       "uid-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    window.localStorage.setItem(UID_KEY, id);
+    lsSet(UID_KEY, id);
   }
   return id;
 }

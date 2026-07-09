@@ -6,6 +6,14 @@ import { dateKey as kstDateKey } from "./time";
 const JOURNAL_KEY = "today-mood:journal:v1";
 const SAVED_KEY = "today-mood:saved:v1";
 
+// sandbox iframe 등에서 localStorage 접근이 막힐 수 있으므로 안전하게 감싼다
+function lsGet(key: string): string | null {
+  try { return window.localStorage.getItem(key); } catch { return null; }
+}
+function lsSet(key: string, value: string): void {
+  try { window.localStorage.setItem(key, value); } catch { /* 무시 */ }
+}
+
 export type QA = { q: string; a: string };
 
 // 날짜별 체크인 기록
@@ -81,7 +89,7 @@ export function normalizeJournal(raw: Record<string, unknown>): JournalMap {
 export function loadJournal(): JournalMap {
   if (typeof window === "undefined") return {};
   const raw = safeParse<Record<string, unknown>>(
-    window.localStorage.getItem(JOURNAL_KEY),
+    lsGet(JOURNAL_KEY),
     {}
   );
   return normalizeJournal(raw);
@@ -111,14 +119,14 @@ export function mergeJournals(a: JournalMap, b: JournalMap): JournalMap {
 /** 전체 저널을 통째로 저장 (클라우드 복원용) */
 export function saveJournalAll(journal: JournalMap): void {
   if (typeof window !== "undefined") {
-    window.localStorage.setItem(JOURNAL_KEY, JSON.stringify(journal));
+    lsSet(JOURNAL_KEY, JSON.stringify(journal));
   }
 }
 
 /** 전체 담은문장을 통째로 저장 (클라우드 복원용) */
 export function saveSavedAll(items: SavedItem[]): void {
   if (typeof window !== "undefined") {
-    window.localStorage.setItem(SAVED_KEY, JSON.stringify(items));
+    lsSet(SAVED_KEY, JSON.stringify(items));
   }
 }
 
@@ -127,14 +135,14 @@ export function recordEntry(key: string, entry: Entry): JournalMap {
   const current = loadJournal();
   const next = { ...current, [key]: [...(current[key] || []), entry] };
   if (typeof window !== "undefined") {
-    window.localStorage.setItem(JOURNAL_KEY, JSON.stringify(next));
+    lsSet(JOURNAL_KEY, JSON.stringify(next));
   }
   return next;
 }
 
 export function loadSaved(): SavedItem[] {
   if (typeof window === "undefined") return [];
-  return safeParse<SavedItem[]>(window.localStorage.getItem(SAVED_KEY), []);
+  return safeParse<SavedItem[]>(lsGet(SAVED_KEY), []);
 }
 
 export function addSaved(item: SavedItem): SavedItem[] {
@@ -146,7 +154,7 @@ export function addSaved(item: SavedItem): SavedItem[] {
   }
   const next = [item, ...current];
   if (typeof window !== "undefined") {
-    window.localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    lsSet(SAVED_KEY, JSON.stringify(next));
   }
   return next;
 }
@@ -154,7 +162,7 @@ export function addSaved(item: SavedItem): SavedItem[] {
 export function removeSaved(id: string): SavedItem[] {
   const next = loadSaved().filter((s) => s.id !== id);
   if (typeof window !== "undefined") {
-    window.localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    lsSet(SAVED_KEY, JSON.stringify(next));
   }
   return next;
 }
