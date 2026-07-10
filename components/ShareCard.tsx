@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { toBlob } from "html-to-image";
+import { useState } from "react";
 import tw from "tailwind-styled-components";
 
 const ShareWrap = tw.div`w-full grid gap-3.5`;
@@ -274,76 +273,47 @@ function download(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+// 저장: 모바일은 공유 시트(사진 앱에 저장 가능), 그 외엔 파일 다운로드
+async function saveImage(blob: Blob, filename: string) {
+  const file = new File([blob], filename, { type: "image/png" });
+  const nav = navigator as Navigator & {
+    canShare?: (d: unknown) => boolean;
+    share?: (d: unknown) => Promise<void>;
+  };
+  if (nav.canShare && nav.share && nav.canShare({ files: [file] })) {
+    try {
+      await nav.share({ files: [file], title: "오늘의 마음 기록" });
+      return;
+    } catch (e) {
+      // 사용자가 취소한 경우엔 그대로 종료, 그 외 실패는 다운로드로 폴백
+      if ((e as { name?: string })?.name === "AbortError") return;
+    }
+  }
+  download(blob, filename);
+}
+
 export default function ShareCard({ data }: { data: ShareCardData }) {
   const [busy, setBusy] = useState(false);
-  const previewRef = useRef<HTMLDivElement>(null);
 
-  const saveViaCanvas = async (filename: string) => {
-    const canvas = await drawCard(data);
-    if (canvas) {
-      await new Promise<void>((resolve) =>
-        canvas.toBlob((blob) => {
-          if (blob) download(blob, filename);
-          resolve();
-        }, "image/png")
-      );
-    }
-  };
-
+  // 캔버스로 카드를 그려서 저장/공유 — 모바일/데스크톱 모두 동일하게 동작
   const handleSave = async () => {
     setBusy(true);
-    const filename = `오늘의기분_${data.dateText.replace(/[^0-9]/g, "")}.png`;
-    // 화면 밖에 '고정 폭' 복제본을 만들어 캡처 → 모바일/데스크톱 상관없이 항상 동일한 카드
-    let host: HTMLDivElement | null = null;
     try {
-      const node = previewRef.current;
-      if (node) {
-        const CARD_W = 600; // 데스크톱 기준 폭으로 고정
-        host = document.createElement("div");
-        host.style.cssText = `position:fixed;left:-99999px;top:0;width:${CARD_W}px;pointer-events:none;z-index:-1;`;
-        const clone = node.cloneNode(true) as HTMLElement;
-        clone.style.width = `${CARD_W}px`;
-        // 모바일 미디어쿼리로 줄어든 시트 여백을 데스크톱 값으로 되돌림
-        const sheet = clone.querySelector<HTMLElement>("[data-sheet]");
-        if (sheet) {
-          sheet.style.setProperty("margin", "220px 26px 26px", "important");
-          sheet.style.setProperty("padding", "26px 24px 22px", "important");
-        }
-        host.appendChild(clone);
-        document.body.appendChild(host);
-
-        // 일러스트가 다 로드된 뒤 캡처
-        const art = clone.querySelector<HTMLImageElement>("[data-art]");
-        if (art && !art.complete) {
-          await new Promise((r) => {
-            art.onload = r;
-            art.onerror = r;
-          });
-        }
-
-        const blob = await toBlob(clone, {
-          pixelRatio: 2,
-          cacheBust: true,
-          backgroundColor: "#f4eadc",
-        });
-        if (blob) {
-          download(blob, filename);
-          return;
-        }
-      }
-      // 폴백: 캔버스로 직접 그리기
-      await saveViaCanvas(filename);
-    } catch {
-      await saveViaCanvas(filename);
+      const filename = `오늘의기분_${data.dateText.replace(/[^0-9]/g, "")}.png`;
+      const canvas = await drawCard(data);
+      if (!canvas) return;
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob((b) => resolve(b), "image/png")
+      );
+      if (blob) await saveImage(blob, filename);
     } finally {
-      if (host && host.parentNode) host.parentNode.removeChild(host);
       setBusy(false);
     }
   };
 
   return (
     <ShareWrap>
-      <Preview ref={previewRef}>
+      <Preview>
         {data.imageSrc && (
           <Art data-art src={data.imageSrc} alt="" crossOrigin="anonymous" />
         )}

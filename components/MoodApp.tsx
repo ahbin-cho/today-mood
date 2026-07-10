@@ -35,7 +35,7 @@ import {
 } from "@/lib/storage";
 import { kst } from "@/lib/time";
 import { resolveUid } from "@/lib/uid";
-import { pushToParent } from "@/lib/cloud";
+import { pushToParent, postHeightToParent } from "@/lib/cloud";
 import ShareCard, { type ShareCardData } from "@/components/ShareCard";
 import {
   Tabs, Tab, DailyBanner, DailyLabel, DailyText, DailyAuthor, SectionLabel,
@@ -170,6 +170,36 @@ export default function MoodApp() {
         setSaved(mergedS);
       }
     })();
+  }, []);
+
+  // iframe 임베드 시: 콘텐츠(main) 실제 높이를 부모에 알려 iframe이 딱 맞게 크기 조정
+  // → 부모가 큰/고정 높이를 줘서 생기는 여백·이중 스크롤 제거. (부모는 mood-resize 수신 3줄만 추가)
+  useEffect(() => {
+    if (typeof window === "undefined" || window.parent === window) return;
+    const main = document.querySelector("main");
+    if (!main) return;
+    let last = 0;
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      const h = Math.ceil(main.getBoundingClientRect().height);
+      if (h && Math.abs(h - last) > 1) {
+        last = h;
+        postHeightToParent(h);
+      }
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+    const ro = new ResizeObserver(schedule);
+    ro.observe(main);
+    window.addEventListener("resize", schedule);
+    schedule();
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", schedule);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   const dateText = today ? labelOf(today) : "";

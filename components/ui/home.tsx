@@ -89,12 +89,14 @@ export const PersonaTag = tw.span`
 `;
 
 export const MoodGrid = tw.div`
-  grid grid-cols-1 sm:grid-cols-2 gap-3
+  grid grid-cols-2 gap-2.5 sm:gap-3
 `;
 
 export const MoodBtn = tw.button`
-  relative grid grid-cols-[48px_1fr] items-center gap-[14px]
-  min-h-[112px] pt-[19px] pr-5 pb-5 pl-6 rounded-[24px]
+  relative grid grid-cols-[36px_1fr] items-center gap-2.5
+  min-h-[92px] p-3.5 rounded-[18px]
+  sm:grid-cols-[48px_1fr] sm:gap-[14px] sm:min-h-[112px]
+  sm:pt-[19px] sm:pr-5 sm:pb-5 sm:pl-6 sm:rounded-[24px]
   text-left overflow-hidden
   bg-[rgba(255,255,255,0.82)] border border-line cursor-pointer
   transition-[transform,box-shadow,border-color] duration-200
@@ -102,22 +104,23 @@ export const MoodBtn = tw.button`
 `;
 
 export const MoodEmoji = tw.span`
-  grid place-items-center w-[44px] h-[44px]
-  text-[24px] leading-none rounded-[14px]
-  bg-[rgba(176,137,95,0.12)]
+  grid place-items-center w-9 h-9 text-[20px] rounded-[12px]
+  sm:w-[44px] sm:h-[44px] sm:text-[24px] sm:rounded-[14px]
+  leading-none bg-[rgba(176,137,95,0.12)]
 `;
 
 export const MoodCopy = tw.span`
-  grid gap-1.5 min-w-0
+  grid gap-1 sm:gap-1.5 min-w-0
 `;
 
 export const MoodName = tw.span`
-  font-soft text-left text-[17px] leading-[1.3] font-bold tracking-[-0.01em]
+  font-soft text-left text-[15px] sm:text-[17px] leading-[1.3] font-bold tracking-[-0.01em]
   text-[#33291f] [word-break:keep-all]
 `;
 
 export const MoodCaption = tw.span`
-  font-soft block text-[13.5px] leading-[1.55] text-[#8c7d6b] [word-break:keep-all]
+  font-soft block text-[12px] leading-[1.5] sm:text-[13.5px] sm:leading-[1.55]
+  text-[#8c7d6b] [word-break:keep-all]
 `;
 
 export const MoodLine = tw.span`
