@@ -92,8 +92,9 @@ window.addEventListener("message", async (e) => {
 ### 전체 코드 (복붙용)
 
 > **중요 — 이중 스크롤/여백 없애기:** iframe에 `height`를 고정하지 말고,
-> 앱이 보내주는 `mood-resize` 높이에 맞춰 동적으로 세팅하세요. 그러면 iframe이
+> 앱이 보내주는 `embed:resize` 높이에 맞춰 동적으로 세팅하세요. 그러면 iframe이
 > 콘텐츠에 딱 맞아 **iframe 내부 스크롤이 사라지고, 부모 페이지 스크롤 하나만** 남습니다.
+> 이 자동 높이는 앱 무관 공통 규약입니다 → 상세·다른 위젯 재사용: [embed-resize-protocol.md](./embed-resize-protocol.md)
 
 ```html
 <div id="mood-container">
@@ -111,9 +112,10 @@ window.addEventListener("message", async (e) => {
   const MOOD_ORIGIN = "https://오늘의마음주소";
 
   // 0) 자동 높이: 앱이 콘텐츠 높이를 보내면 iframe을 그 높이로 맞춤 (이중 스크롤 제거)
+  //    e.source 로 매칭하면 위젯 여러 개도 이 리스너 하나로 커버됨 (embed-resize-protocol.md)
   window.addEventListener("message", (e) => {
     if (e.origin !== MOOD_ORIGIN) return;
-    if (e.data?.type === "mood-resize" && e.data.height) {
+    if (e.data?.type === "embed:resize" && typeof e.data.height === "number") {
       frame.style.height = e.data.height + "px";
     }
   });
@@ -225,7 +227,7 @@ app.post("/api/mood-state", async (req, res) => {
 | type | 언제 | 내용 |
 | --- | --- | --- |
 | `mood-save` | 체크인/문장담기/삭제 시 | `{ data: { journal, saved } }` |
-| `mood-resize` | 콘텐츠 높이가 바뀔 때마다 | `{ height: number }` — iframe 높이를 이 값으로 맞추면 이중 스크롤/여백이 사라짐 |
+| `embed:resize` | 콘텐츠 높이가 바뀔 때마다 | `{ height: number, app?: string }` — iframe 높이를 이 값으로 맞추면 이중 스크롤/여백이 사라짐. 앱 무관 공통 규약([embed-resize-protocol.md](./embed-resize-protocol.md)) |
 
 ### 부모 → 앱 (응답)
 

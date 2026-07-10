@@ -35,7 +35,8 @@ import {
 } from "@/lib/storage";
 import { kst } from "@/lib/time";
 import { resolveUid } from "@/lib/uid";
-import { pushToParent, postHeightToParent } from "@/lib/cloud";
+import { pushToParent } from "@/lib/cloud";
+import { startEmbedAutoResize } from "@/lib/embed-resize";
 import ShareCard, { type ShareCardData } from "@/components/ShareCard";
 import {
   Tabs, Tab, DailyBanner, DailyLabel, DailyText, DailyAuthor, SectionLabel,
@@ -68,7 +69,6 @@ import {
 } from "@/components/ui/saved";
 import MoodCalendar from "@/components/MoodCalendar";
 
-const DEFAULT_BG: [string, string] = ["#FBF6EE", "#F3E9DB"];
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
 const INTENSITY_LABELS = ["", "아주 살짝", "살짝", "보통", "꽤", "아주 많이"];
 // persona is now randomly assigned when starting a check-in
@@ -172,35 +172,12 @@ export default function MoodApp() {
     })();
   }, []);
 
-  // iframe 임베드 시: 콘텐츠(main) 실제 높이를 부모에 알려 iframe이 딱 맞게 크기 조정
-  // → 부모가 큰/고정 높이를 줘서 생기는 여백·이중 스크롤 제거. (부모는 mood-resize 수신 3줄만 추가)
-  useEffect(() => {
-    if (typeof window === "undefined" || window.parent === window) return;
-    const main = document.querySelector("main");
-    if (!main) return;
-    let last = 0;
-    let raf = 0;
-    const measure = () => {
-      raf = 0;
-      const h = Math.ceil(main.getBoundingClientRect().height);
-      if (h && Math.abs(h - last) > 1) {
-        last = h;
-        postHeightToParent(h);
-      }
-    };
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(measure);
-    };
-    const ro = new ResizeObserver(schedule);
-    ro.observe(main);
-    window.addEventListener("resize", schedule);
-    schedule();
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", schedule);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
+  // iframe 임베드 시: 콘텐츠(main) 높이를 부모에 알려 자동 높이 조정 (embed:resize 규약)
+  // → 부모가 준 큰/고정 높이 탓의 여백·이중 스크롤 제거. 규약: docs/embed-resize-protocol.md
+  useEffect(
+    () => startEmbedAutoResize({ app: "today-mood", target: "main" }),
+    []
+  );
 
   const dateText = today ? labelOf(today) : "";
   const todayKey = today ? dateKey(today) : "";
@@ -263,8 +240,6 @@ export default function MoodApp() {
       return `🌱 ${streak}일째 마음을 살피고 있어요. 오늘도 잘 왔어요.`;
     return `🌱 벌써 ${total}번째 마음을 들여다봤어요. 오늘도 잘 왔어요.`;
   }, [journal, streak]);
-
-  const bg = mood && stage !== "home" ? mood.bg : DEFAULT_BG;
 
   // ---- 답변 파생값 ----
   const isComplete = () =>
